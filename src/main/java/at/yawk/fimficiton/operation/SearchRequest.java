@@ -8,6 +8,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.util.Collections;
 import java.util.List;
 
 import lombok.AccessLevel;
@@ -17,7 +18,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
-import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 
 import org.xml.sax.SAXException;
@@ -92,6 +92,9 @@ public class SearchRequest extends AbstractRequest<List<Story>> {
     }
     
     private List<Story> requestRss() throws IOException, SAXException {
+        if (this.page > 0) {
+            return Collections.emptyList();
+        }
         if (this.perspective == null) {
             throw new IllegalStateException("User not given");
         }
@@ -108,13 +111,16 @@ public class SearchRequest extends AbstractRequest<List<Story>> {
         return new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
     }
     
-    @SneakyThrows(UnsupportedEncodingException.class)
     private String convertSearchParamsToUrlParams() {
         if (this.parameters == null) {
             throw new IllegalStateException("Search parameters not given");
         }
         final StringBuilder result = new StringBuilder("view=category&search=");
-        result.append(URLEncoder.encode(this.getParameters().getTerm(), "UTF-8"));
+        try {
+            result.append(URLEncoder.encode(this.getParameters().getTerm(), "UTF-8"));
+        } catch (final UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
         result.append("&order=");
         result.append(SearchRequestUtil.orderToParameterString(this.getParameters().getOrder()));
         for (final Category included : this.getParameters().getIncludedCategories()) {
@@ -205,8 +211,8 @@ public class SearchRequest extends AbstractRequest<List<Story>> {
          */
         FULL,
         /**
-         * Fastest method to get all unread favorites at once. Requires
-         * {@link SearchRequest#perspective}. Only works for unread favorites,
+         * Fast and accurate method to get unread favorites. Can only return one
+         * page of a maximum of 10 stories. Only works for unread favorites,
          * user ID is required.
          * 
          * @see GetLoggedInUserOperation

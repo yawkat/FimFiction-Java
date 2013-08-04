@@ -4,7 +4,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
-import lombok.SneakyThrows;
 import at.yawk.fimficiton.FimFiction;
 
 /**
@@ -25,9 +24,12 @@ class Util {
      * that <b>cannot be</b> malformed in any case.
      * {@link MalformedURLException} will be thrown silently if operation fails.
      */
-    @SneakyThrows(MalformedURLException.class)
     static URL toUrl(final String url) {
-        return new URL(url);
+        try {
+            return new URL(url);
+        } catch (final MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
     }
     
     /**
