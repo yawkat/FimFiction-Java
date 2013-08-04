@@ -3,6 +3,8 @@ package at.yawk.fimficiton.json;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+
 import com.google.gson.JsonObject;
 
 class Util {
@@ -87,7 +89,7 @@ class Util {
      * <code>null</code>.
      */
     static String getString(final JsonObject object, final String name) {
-        return object.has(name) ? object.get(name).getAsString() : null;
+        return object.has(name) ? StringEscapeUtils.unescapeHtml4(object.get(name).getAsString()) : null;
     }
     
     /**
