@@ -78,7 +78,7 @@ public class GetStoryMetaOperation extends AbstractRequest<Story> {
         
         // parse JSON data
         final StoryParser parser = new StoryParser();
-        return parser.parse(returned);
+        return parser.parse(returned.getAsJsonObject("story"));
     }
     
     private Story requestFull(final FimFiction session) throws IOException, SAXException {
