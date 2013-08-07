@@ -55,7 +55,7 @@ public class RateOperation extends AbstractRequest<Story> {
     protected Story request(final FimFiction session) throws Exception {
         final RatingParser parser = new RatingParser();
         
-        final URL rateUrl = new URL("http://fimfiction.net/rate.php");
+        final URL rateUrl = new URL(Util.BASE_URL + "/rate.php");
         final URLConnection connection = rateUrl.openConnection();
         Util.preparePost(connection);
         connection.setRequestProperty("Cookie", Util.getCookies(session));

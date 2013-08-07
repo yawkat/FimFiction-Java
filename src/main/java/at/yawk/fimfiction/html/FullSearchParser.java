@@ -18,13 +18,13 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 import at.yawk.fimfiction.Chapter;
-import at.yawk.fimfiction.Character;
-import at.yawk.fimfiction.User;
 import at.yawk.fimfiction.Chapter.ChapterBuilder;
+import at.yawk.fimfiction.Character;
 import at.yawk.fimfiction.Story.Category;
 import at.yawk.fimfiction.Story.ContentRating;
 import at.yawk.fimfiction.Story.FavoriteState;
 import at.yawk.fimfiction.Story.Status;
+import at.yawk.fimfiction.User;
 import at.yawk.fimfiction.User.UserBuilder;
 
 /**
@@ -149,7 +149,7 @@ public class FullSearchParser extends AbstractSearchParser {
         case 14:
             if (qName.equals("a")) {
                 try {
-                    this.getCurrentBuilder().url(new URL("http://fimfiction.net" + atts.getValue("href")));
+                    this.getCurrentBuilder().url(new URL("http://www.fimfiction.net" + atts.getValue("href")));
                 } catch (final MalformedURLException e) {
                     throw new SAXException(e);
                 }
@@ -251,7 +251,7 @@ public class FullSearchParser extends AbstractSearchParser {
                 this.stage = 31;
             } else {
                 try {
-                    this.chapter.url(new URL("http://fimfiction.net" + atts.getValue("href")));
+                    this.chapter.url(new URL("http://www.fimfiction.net" + atts.getValue("href")));
                 } catch (final MalformedURLException e) {
                     throw new SAXException(e);
                 }
@@ -262,7 +262,7 @@ public class FullSearchParser extends AbstractSearchParser {
         case 31:
             if (qName.equals("a")) {
                 try {
-                    this.chapter.url(new URL("http://fimfiction.net" + atts.getValue("href")));
+                    this.chapter.url(new URL("http://www.fimfiction.net" + atts.getValue("href")));
                 } catch (final MalformedURLException e) {
                     throw new SAXException(e);
                 }

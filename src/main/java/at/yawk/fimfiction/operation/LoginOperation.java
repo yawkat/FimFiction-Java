@@ -30,7 +30,7 @@ public class LoginOperation extends AbstractRequest<LoginOperation.Result> {
     /**
      * {@link URL} used for requesting session ID.
      */
-    private static final URL LOGIN_URL = Util.toUrl("http://www.fimfiction.net/ajax/login.php");
+    private static final URL LOGIN_URL = Util.toUrl(Util.BASE_URL + "/ajax/login.php");
     
     /**
      * Username to be logged in.

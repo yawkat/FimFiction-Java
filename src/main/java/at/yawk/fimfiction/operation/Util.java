@@ -16,6 +16,10 @@ class Util {
      * Name of the cookie used to store the session ID.
      */
     static final String SESSION_COOKIE_NAME = "session_token";
+    /**
+     * Base URL used for any request.
+     */
+    static final String BASE_URL = "http://www.fimfiction.net";
     
     private Util() {}
     

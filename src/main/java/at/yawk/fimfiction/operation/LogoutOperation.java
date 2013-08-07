@@ -17,7 +17,7 @@ import at.yawk.fimfiction.FimFiction;
 public class LogoutOperation extends DiscardSessionOperation {
     @Override
     public void execute(final FimFiction session) throws IOException {
-        final URL url = new URL("http://fimfiction.net/ajax/logout.php");
+        final URL url = new URL(Util.BASE_URL + "/ajax/logout.php");
         final URLConnection connection = url.openConnection();
         connection.setRequestProperty("Cookie", Util.getCookies(session));
         connection.connect();

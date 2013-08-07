@@ -29,7 +29,7 @@ public class ToggleReadStatusOperation extends AbstractRequest<Chapter> {
     
     @Override
     protected Chapter request(final FimFiction session) throws Exception {
-        final URL rateUrl = new URL("http://www.fimfiction.net/ajax/toggle_read.php");
+        final URL rateUrl = new URL(Util.BASE_URL + "/ajax/toggle_read.php");
         final URLConnection connection = rateUrl.openConnection();
         Util.preparePost(connection);
         connection.setRequestProperty("Cookie", Util.getCookies(session));

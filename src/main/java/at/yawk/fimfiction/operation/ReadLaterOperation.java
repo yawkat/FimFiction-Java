@@ -43,7 +43,7 @@ public class ReadLaterOperation extends AbstractRequest<Story> {
     protected Story request(final FimFiction session) throws Exception {
         final ReadLaterParser parser = new ReadLaterParser();
         
-        final URL rateUrl = new URL("http://fimfiction.net/rate.php");
+        final URL rateUrl = new URL(Util.BASE_URL + "/rate.php");
         final URLConnection connection = rateUrl.openConnection();
         Util.preparePost(connection);
         connection.setRequestProperty("Cookie", Util.getCookies(session));

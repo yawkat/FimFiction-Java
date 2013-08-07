@@ -65,7 +65,7 @@ public class GetStoryMetaOperation extends AbstractRequest<Story> {
      */
     private Story requestJson() throws IOException {
         // prepare URL
-        final URL targeting = new URL("http://fimfiction.net/api/story.php?story=" + this.storyFor.getId());
+        final URL targeting = new URL(Util.BASE_URL + "/api/story.php?story=" + this.storyFor.getId());
         
         // download and convert to JsonObject using Gson
         final JsonObject returned;
@@ -83,7 +83,7 @@ public class GetStoryMetaOperation extends AbstractRequest<Story> {
     
     private Story requestFull(final FimFiction session) throws IOException, SAXException {
         // prepare URL
-        final URL targeting = new URL("http://fimfiction.net/story/" + this.storyFor.getId());
+        final URL targeting = new URL(Util.BASE_URL + "/story/" + this.storyFor.getId());
         
         final URLConnection connection = targeting.openConnection();
         connection.setRequestProperty("Cookie", Util.getCookies(session));

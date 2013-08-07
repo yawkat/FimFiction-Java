@@ -26,8 +26,8 @@ import at.yawk.fimfiction.Character;
 import at.yawk.fimfiction.FimFiction;
 import at.yawk.fimfiction.SearchParameters;
 import at.yawk.fimfiction.Story;
-import at.yawk.fimfiction.User;
 import at.yawk.fimfiction.Story.Category;
+import at.yawk.fimfiction.User;
 import at.yawk.fimfiction.html.FullSearchParser;
 import at.yawk.fimfiction.html.IdSearchParser;
 import at.yawk.fimfiction.html.RssUnreadParser;
@@ -98,13 +98,13 @@ public class SearchRequest extends AbstractRequest<List<Story>> {
         if (this.perspective == null) {
             throw new IllegalStateException("User not given");
         }
-        final URL feedUrl = new URL("http://www.fimfiction.net/rss/tracking.php?user=" + this.getPerspective().getId());
+        final URL feedUrl = new URL(Util.BASE_URL + "/rss/tracking.php?user=" + this.getPerspective().getId());
         @Cleanup final Reader reader = new BufferedReader(new InputStreamReader(feedUrl.openStream(), "UTF-8"));
         return new RssUnreadParser().parse(reader);
     }
     
     private Reader getSearchPageReader(final FimFiction session) throws IOException {
-        final URL searchPageUrl = new URL("http://fimfiction.net/index.php?" + this.convertSearchParamsToUrlParams());
+        final URL searchPageUrl = new URL(Util.BASE_URL + "/index.php?" + this.convertSearchParamsToUrlParams());
         final URLConnection connection = searchPageUrl.openConnection();
         connection.setRequestProperty("Cookie", Util.getCookies(session));
         connection.connect();

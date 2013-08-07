@@ -31,9 +31,9 @@ public class ChapterDownloadOperation extends AbstractDownloadOperation {
     protected URL getDownloadUrl() throws MalformedURLException {
         switch (this.getDownloadType()) {
         case HTML:
-            return new URL("http://fimfiction.net/download_chapter.php?html&chapter=" + this.getChapter().getId());
+            return new URL(Util.BASE_URL + "/download_chapter.php?html&chapter=" + this.getChapter().getId());
         case TEXT:
-            return new URL("http://fimfiction.net/download_chapter.php?chapter=" + this.getChapter().getId());
+            return new URL(Util.BASE_URL + "/download_chapter.php?chapter=" + this.getChapter().getId());
         default:
             throw new IllegalArgumentException("Unknown download type: " + this.getDownloadType().toString());
         }

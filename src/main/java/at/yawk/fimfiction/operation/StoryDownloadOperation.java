@@ -27,11 +27,11 @@ public class StoryDownloadOperation extends AbstractDownloadOperation {
     protected URL getDownloadUrl() throws MalformedURLException {
         switch (this.getDownloadType()) {
         case EPUB:
-            return new URL("http://fimfiction.net/download_epub.php?story=" + this.getStory().getId());
+            return new URL(Util.BASE_URL + "/download_epub.php?story=" + this.getStory().getId());
         case HTML:
-            return new URL("http://fimfiction.net/download_story.php?html&story=" + this.getStory().getId());
+            return new URL(Util.BASE_URL + "/download_story.php?html&story=" + this.getStory().getId());
         case TEXT:
-            return new URL("http://fimfiction.net/download_story.php?story=" + this.getStory().getId());
+            return new URL(Util.BASE_URL + "/download_story.php?story=" + this.getStory().getId());
         default:
             throw new IllegalArgumentException("Unknown download type: " + this.getDownloadType().toString());
         }

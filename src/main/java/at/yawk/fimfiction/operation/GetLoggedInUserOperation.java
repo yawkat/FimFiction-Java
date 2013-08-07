@@ -20,7 +20,7 @@ import at.yawk.fimfiction.html.UserIdFinder;
 public class GetLoggedInUserOperation extends AbstractRequest<User> {
     @Override
     protected User request(final FimFiction session) throws Exception {
-        final URL requestUrl = new URL("http://fimfiction.net/");
+        final URL requestUrl = new URL(Util.BASE_URL + "/");
         final URLConnection connection = requestUrl.openConnection();
         connection.setRequestProperty("Cookie", Util.getCookies(session));
         connection.connect();
