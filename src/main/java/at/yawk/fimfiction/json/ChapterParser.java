@@ -27,7 +27,9 @@ public class ChapterParser implements IJsonParser<Chapter> {
      */
     protected void parseInto(final JsonObject parse, final ChapterBuilder builder) {
         builder.id(getInt(parse, "id"));
-        builder.title(getString(parse, "title"));
+        // Sometimes null is returned as the title in a json chapter result.
+        // This is a bug in the website.
+        builder.title(parse.get("title").isJsonNull() ? "" : getString(parse, "title"));
         builder.wordCount(getInt(parse, "words"));
         builder.viewCount(getInt(parse, "views"));
         builder.modificationDate(getLong(parse, "date_modified") * 1000L);
