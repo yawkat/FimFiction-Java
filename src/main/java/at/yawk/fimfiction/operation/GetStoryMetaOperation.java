@@ -19,6 +19,7 @@ import lombok.experimental.FieldDefaults;
 
 import org.xml.sax.SAXException;
 
+import at.yawk.fimfiction.Chapter;
 import at.yawk.fimfiction.FimFiction;
 import at.yawk.fimfiction.Story;
 import at.yawk.fimfiction.html.FullSearchParser;
@@ -52,7 +53,11 @@ public class GetStoryMetaOperation extends AbstractRequest<Story> {
     protected Story request(final FimFiction session) throws Exception {
         switch (this.requestMethod) {
         case JSON:
-            return this.requestJson();
+            final URL targeting1 = new URL(Util.BASE_URL + "/api/story.php?story=" + this.storyFor.getId());
+            return this.requestJson(targeting1);
+        case JSON_CONTENT:
+            final URL targeting2 = new URL(Util.BASE_URL + "/api/v1/story/" + this.storyFor.getId() + "?chapters");
+            return this.requestJson(targeting2);
         case WEB:
             return this.requestFull(session);
         default:
@@ -63,10 +68,7 @@ public class GetStoryMetaOperation extends AbstractRequest<Story> {
     /**
      * Load story data using JSON request.
      */
-    private Story requestJson() throws IOException {
-        // prepare URL
-        final URL targeting = new URL(Util.BASE_URL + "/api/story.php?story=" + this.storyFor.getId());
-        
+    private Story requestJson(final URL targeting) throws IOException {
         // download and convert to JsonObject using Gson
         final JsonObject returned;
         final InputStream request = targeting.openStream();
@@ -111,6 +113,14 @@ public class GetStoryMetaOperation extends AbstractRequest<Story> {
          * also returns data such as favorite status, read / unread chapters,
          * like token etc.
          */
-        WEB;
+        WEB,
+        /**
+         * Accurate request method that returns {@link Chapter#content} on top
+         * of data that {@link #JSON} gives back. Very big HTTP request.
+         * Currently in development, behavior may change.
+         * 
+         * @since 1.0.4
+         */
+        JSON_CONTENT;
     }
 }

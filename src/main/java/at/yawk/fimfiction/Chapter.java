@@ -47,6 +47,12 @@ public class Chapter {
      */
     long modificationDate;
     /**
+     * Text content of the chapter.
+     * 
+     * @since 1.0.4
+     */
+    String content;
+    /**
      * <code>true</code> if the current logged in user has not read this chapter
      * yet, otherwise <code>false</code>. Defaults to <code>false</code> when
      * not logged in.

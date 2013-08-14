@@ -1,6 +1,7 @@
 package at.yawk.fimfiction;
 
 import java.net.URL;
+import java.util.Date;
 
 import lombok.Value;
 import lombok.experimental.Builder;
@@ -30,4 +31,23 @@ public class User {
      * {@link URL} of the profile image of this user.
      */
     URL profileImageUrl;
+    /**
+     * Biography as seen on the profile page.
+     * 
+     * @since 1.0.4
+     */
+    String biography;
+    /**
+     * Amount of followers this {@link User} has.
+     * 
+     * @since 1.0.4
+     */
+    int followerCount;
+    /**
+     * Date this user joined.
+     * 
+     * @see Date#Date(long)
+     * @since 1.0.4
+     */
+    long joinDate;
 }

@@ -33,6 +33,7 @@ public class ChapterParser implements IJsonParser<Chapter> {
         builder.wordCount(getInt(parse, "words"));
         builder.viewCount(getInt(parse, "views"));
         builder.modificationDate(getLong(parse, "date_modified") * 1000L);
+        builder.content(getString(parse, "content"));
     }
     
     @Override

@@ -56,7 +56,12 @@ public class StoryParser implements IJsonParser<Story> {
         builder.likeCount(getInt(parse, "likes"));
         builder.dislikeCount(getInt(parse, "dislikes"));
         if (parse.has("categories")) {
-            builder.categories(new CategoryParser().parse(parse.getAsJsonObject("categories")));
+            final JsonElement categories = parse.get("categories");
+            if (categories.isJsonObject()) {
+                builder.categories(new CategoryParser().parse(categories.getAsJsonObject()));
+            } else if (categories.isJsonArray()) {
+                builder.categories(new CategoryParser().parse(categories.getAsJsonArray()));
+            }
         }
         if (parse.has("author")) {
             builder.author(new UserParser().parse(parse.getAsJsonObject("author")));
@@ -155,6 +160,42 @@ class CategoryParser implements IJsonParser<Set<Category>> {
         }
         if (getBoolean(object, "Anthro")) {
             result.add(Category.ANTHRO);
+        }
+        return Collections.unmodifiableSet(result);
+    }
+    
+    /**
+     * Parses the given {@link JsonArray} to a {@link Set} of categories.
+     */
+    public Set<Category> parse(final JsonArray object) {
+        final Set<Category> result = EnumSet.noneOf(Category.class);
+        for (final JsonElement elem : object) {
+            final String categoryName = elem.getAsString();
+            if (categoryName.equals("romance")) {
+                result.add(Category.ROMANCE);
+            } else if (categoryName.equals("tragedy")) {
+                result.add(Category.TRAGEDY);
+            } else if (categoryName.equals("sad")) {
+                result.add(Category.SAD);
+            } else if (categoryName.equals("dark")) {
+                result.add(Category.DARK);
+            } else if (categoryName.equals("comedy")) {
+                result.add(Category.COMEDY);
+            } else if (categoryName.equals("random")) {
+                result.add(Category.RANDOM);
+            } else if (categoryName.equals("crossover")) {
+                result.add(Category.CROSSOVER);
+            } else if (categoryName.equals("adventure")) {
+                result.add(Category.ADVENTURE);
+            } else if (categoryName.equals("slice_of_life")) {
+                result.add(Category.SLICE_OF_LIFE);
+            } else if (categoryName.equals("alternate_universe")) {
+                result.add(Category.ALTERNATE_UNIVERSE);
+            } else if (categoryName.equals("human")) {
+                result.add(Category.HUMAN);
+            } else if (categoryName.equals("anthro")) {
+                result.add(Category.ANTHRO);
+            }
         }
         return Collections.unmodifiableSet(result);
     }
