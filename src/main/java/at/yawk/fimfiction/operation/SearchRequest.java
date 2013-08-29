@@ -34,10 +34,10 @@ import at.yawk.fimfiction.html.RssUnreadParser;
 
 /**
  * Abstract base class for a search request. Implementations should get the
- * search page {@link #page} with the parameters {@link #parameters} from the
- * viewpoint of {@link #perspective}. If dynamic result size is possible,
- * {@link #suggestedResultCount} should be used. This is not required, access to
- * results must therefore also check the size of the result.
+ * search page {@link #page} with the parameters {@link #parameters}. If dynamic
+ * result size is possible, {@link #suggestedResultCount} should be used. This
+ * is not required, access to results must therefore also check the size of the
+ * result.
  * 
  * @author Yawkat
  */
@@ -58,8 +58,10 @@ public class SearchRequest extends AbstractRequest<List<Story>> {
     /**
      * Perspective from which the search should be performed (unread, favorites,
      * read later).
+     * 
+     * @deprecated use {@link SearchParameters#perspective}
      */
-    User perspective;
+    @Deprecated User perspective;
     /**
      * Search paramters to be given to the website.
      */
@@ -95,7 +97,7 @@ public class SearchRequest extends AbstractRequest<List<Story>> {
         if (this.page > 0) {
             return Collections.emptyList();
         }
-        if (this.perspective == null) {
+        if (this.doGetPerspective() == null) {
             throw new IllegalStateException("User not given");
         }
         final URL feedUrl = new URL(Util.BASE_URL + "/rss/tracking.php?user=" + this.getPerspective().getId());
@@ -170,11 +172,27 @@ public class SearchRequest extends AbstractRequest<List<Story>> {
         result.append("&page=");
         // FimFiction starts with page 1
         result.append(this.getPage() + 1);
-        if (this.getPerspective() != null) {
+        User perspective = this.doGetPerspective();
+        if (perspective != null) {
             result.append("&user=");
-            result.append(this.perspective.getId());
+            result.append(perspective.getId());
         }
         return result.toString();
+    }
+    
+    /**
+     * Return {@link SearchParameters#perspective} from {@link #parameters} if
+     * it is set, otherwise return deprecated {@link #perspective}.
+     */
+    private User doGetPerspective() {
+        SearchParameters params = this.getParameters();
+        if (params != null) {
+            User perspective = params.getPerspective();
+            if (perspective != null) {
+                return perspective;
+            }
+        }
+        return this.getPerspective();
     }
     
     /**
@@ -188,8 +206,8 @@ public class SearchRequest extends AbstractRequest<List<Story>> {
          * changes. Requires {@link SearchRequest#page} and
          * {@link SearchRequest#parameters}. <br>
          * <br>
-         * If a {@link SearchRequest#perspective} is given, this will attempt to
-         * use the given user's viewpoint. This will only work if
+         * If a {@link SearchParameters#perspective} is given, this will attempt
+         * to use the given user's viewpoint. This will only work if
          * {@link SearchParameters#isFavorite()} is enabled and
          * {@link SearchParameters#isReadLater()} and
          * {@link SearchParameters#isReadLater()} are disabled. If those
@@ -202,8 +220,8 @@ public class SearchRequest extends AbstractRequest<List<Story>> {
          * Otherwise behaves like {@link #ID}. Requires
          * {@link SearchRequest#page} and {@link SearchRequest#parameters}. <br>
          * <br>
-         * If a {@link SearchRequest#perspective} is given, this will attempt to
-         * use the given user's viewpoint. This will only work if
+         * If a {@link SearchParameters#perspective} is given, this will attempt
+         * to use the given user's viewpoint. This will only work if
          * {@link SearchParameters#favorite} is enabled and
          * {@link SearchParameters#readLater} and
          * {@link SearchParameters#readLater} are disabled. If those conditions

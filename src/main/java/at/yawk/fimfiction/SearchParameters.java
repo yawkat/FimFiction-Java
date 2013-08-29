@@ -104,6 +104,13 @@ public class SearchParameters {
      * entries of {@link #includedCharacters} or behavior will be undefined.
      */
     @NonNull Set<Character> excludedCharacters = Collections.emptySet();
+    /**
+     * Perspective from which the search should be performed (unread, favorites,
+     * read later).
+     * 
+     * @since 1.0.5
+     */
+    User perspective;
     
     public static enum Order {
         /**
