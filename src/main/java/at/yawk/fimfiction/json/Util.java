@@ -100,7 +100,7 @@ class Util {
     static URL getUrl(final JsonObject object, final String name, final String protocolPrefixIfNeeded) {
         final String url = getString(object, name);
         if (url != null) {
-            final String result = url.startsWith("//") ? protocolPrefixIfNeeded : url;
+            final String result = url.startsWith("//") ? protocolPrefixIfNeeded + url : url;
             try {
                 return new URL(result);
             } catch (final MalformedURLException e) {}
