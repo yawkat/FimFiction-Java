@@ -37,7 +37,7 @@ public class SearchParameters {
     /**
      * Any story returned by searches with these parameters will have all
      * categories in this {@link Set}. Make sure this does not contain any
-     * entries of {@link #exculdedCategories} or behavior will be undefined.
+     * entries of {@link #excludedCategories} or behavior will be undefined.
      */
     @NonNull Set<Category> includedCategories = Collections.emptySet();
     /**
@@ -45,7 +45,7 @@ public class SearchParameters {
      * categories in this {@link Set}. Make sure this does not contain any
      * entries of {@link #includedCategories} or behavior will be undefined.
      */
-    @NonNull Set<Category> exculdedCategories = Collections.emptySet();
+    @NonNull Set<Category> excludedCategories = Collections.emptySet();
     /**
      * Nullable. If this is set to <code>null</code> no check will be performed
      * and all ratings will be allowed. Otherwise, all stories with this exact
@@ -111,6 +111,22 @@ public class SearchParameters {
      * @since 1.0.5
      */
     User perspective;
+    
+    /**
+     * @see #withExcludedCategories(Set)
+     */
+    @Deprecated
+    public SearchParameters withExculdedCategories(final Set<Category> categories) {
+        return this.withExcludedCategories(categories);
+    }
+    
+    /**
+     * @see #getExcludedCategories(Set)
+     */
+    @Deprecated
+    public Set<Category> getExculdedCategories() {
+        return this.getExcludedCategories();
+    }
     
     public static enum Order {
         /**

@@ -129,7 +129,7 @@ public class SearchRequest extends AbstractRequest<List<Story>> {
             result.append("&tags[]=category:");
             result.append(SearchRequestUtil.categoryToParameterString(included));
         }
-        for (final Category excluded : this.getParameters().getExculdedCategories()) {
+        for (final Category excluded : this.getParameters().getExcludedCategories()) {
             result.append("&tags[]=-category:");
             result.append(SearchRequestUtil.categoryToParameterString(excluded));
         }
@@ -172,7 +172,7 @@ public class SearchRequest extends AbstractRequest<List<Story>> {
         result.append("&page=");
         // FimFiction starts with page 1
         result.append(this.getPage() + 1);
-        User perspective = this.doGetPerspective();
+        final User perspective = this.doGetPerspective();
         if (perspective != null) {
             result.append("&user=");
             result.append(perspective.getId());
@@ -185,9 +185,9 @@ public class SearchRequest extends AbstractRequest<List<Story>> {
      * it is set, otherwise return deprecated {@link #perspective}.
      */
     private User doGetPerspective() {
-        SearchParameters params = this.getParameters();
+        final SearchParameters params = this.getParameters();
         if (params != null) {
-            User perspective = params.getPerspective();
+            final User perspective = params.getPerspective();
             if (perspective != null) {
                 return perspective;
             }
