@@ -55,6 +55,7 @@ public class StoryParser implements IJsonParser<Story> {
         builder.contentRating(parseContentRating(getInt(parse, "content_rating", -1)));
         builder.likeCount(getInt(parse, "likes"));
         builder.dislikeCount(getInt(parse, "dislikes"));
+        builder.chapterCount(getInt(parse, "chapter_count"));
         if (parse.has("categories")) {
             final JsonElement categories = parse.get("categories");
             if (categories.isJsonObject()) {
