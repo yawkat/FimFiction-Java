@@ -108,7 +108,7 @@ public class FullSearchParser extends AbstractSearchParser {
         case 5:
             if (qName.equals("input")) {
                 final boolean email = atts.getValue("checked") != null;
-                this.getCurrentBuilder().favorited(this.favorited ? (email ? FavoriteState.FAVORITED_EMAIL : FavoriteState.FAVORITED) : FavoriteState.NOT_FAVORITED);
+                this.getCurrentBuilder().favorited(this.favorited ? email ? FavoriteState.FAVORITED_EMAIL : FavoriteState.FAVORITED : FavoriteState.NOT_FAVORITED);
                 this.stage = 6;
             }
             break;
@@ -455,8 +455,8 @@ public class FullSearchParser extends AbstractSearchParser {
             this.stage = 35;
             break;
         case 36:
-            final int c = toIntLiberal(asString);
-            if (c > 0) {
+            final int c = toIntLiberal(asString, -1);
+            if (c >= -1) {
                 this.chapter.wordCount(c);
             }
             break;
@@ -482,8 +482,8 @@ public class FullSearchParser extends AbstractSearchParser {
             }
             break;
         case 204:
-            final int words = toIntLiberal(asString);
-            if (words > 0) {
+            final int words = toIntLiberal(asString, -1);
+            if (words >= 0) {
                 this.getCurrentBuilder().wordCount(words);
                 this.stage = 205;
             }
@@ -509,18 +509,27 @@ public class FullSearchParser extends AbstractSearchParser {
     }
     
     private static int toIntLiberal(final String toInt) {
-        int result = 0;
+        return toIntLiberal(toInt, 0);
+    }
+    
+    private static int toIntLiberal(final String toInt, final int defaultValue) {
         if (toInt != null) {
+            int result = 0;
+            boolean modified = false;
             for (int i = 0, l = toInt.length(); i < l; i++) {
                 final char c = toInt.charAt(i);
                 final int value = c - '0';
                 if (value >= 0 && value < 10) {
                     result *= 10;
                     result += value;
+                    modified = true;
                 }
             }
+            if (modified) {
+                return result;
+            }
         }
-        return result;
+        return defaultValue;
     }
     
     private static String getDisplayName(final Category category) {
