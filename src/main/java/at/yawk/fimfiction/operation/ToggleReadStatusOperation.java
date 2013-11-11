@@ -9,7 +9,6 @@ import java.io.Writer;
 import java.net.URL;
 import java.net.URLConnection;
 
-import lombok.Cleanup;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.Value;
@@ -34,15 +33,22 @@ public class ToggleReadStatusOperation extends AbstractRequest<Chapter> {
         Util.preparePost(connection);
         connection.setRequestProperty("Cookie", Util.getCookies(session));
         connection.connect();
-        @Cleanup final Writer post = new BufferedWriter(new OutputStreamWriter(connection.getOutputStream()));
-        post.write("chapter=");
-        post.write(Integer.toString(this.getChapter().getId()));
+        final Writer post = new BufferedWriter(new OutputStreamWriter(connection.getOutputStream()));
+        try {
+            post.write("chapter=");
+            post.write(Integer.toString(this.getChapter().getId()));
+        } finally {
+            post.close();
+        }
         
-        @Cleanup final Reader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
-        final char[] buffer = new char[100];
-        final int length = reader.read(buffer);
-        final String resultingImageSource = new String(buffer, 0, length);
-        
-        return this.chapter.withUnread(resultingImageSource.endsWith("tick.png"));
+        final Reader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
+        try {
+            final char[] buffer = new char[100];
+            final int length = reader.read(buffer);
+            final String resultingImageSource = new String(buffer, 0, length);
+            return this.chapter.withUnread(!resultingImageSource.endsWith("tick.png"));
+        } finally {
+            reader.close();
+        }
     }
 }
