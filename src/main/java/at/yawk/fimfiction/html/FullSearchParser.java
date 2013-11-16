@@ -82,7 +82,7 @@ public class FullSearchParser extends AbstractSearchParser {
         case 1:
             String src = atts.getValue("src");
             this.author = User.builder();
-            if (!src.equals("//www.fimfiction-static.net/images/avatars/none_64.png")) {
+            if (src != null && !src.equals("//www.fimfiction-static.net/images/avatars/none_64.png")) {
                 try {
                     this.author.profileImageUrl(new URL("http:" + src));
                 } catch (final MalformedURLException e) {
@@ -225,7 +225,7 @@ public class FullSearchParser extends AbstractSearchParser {
         case 29:
             if (qName.equals("div")) {
                 final String clazz = atts.getValue("class");
-                if (clazz.contains("chapter_container")) {
+                if (clazz != null && clazz.contains("chapter_container")) {
                     if (!clazz.contains("chapter_expander")) {
                         this.stage = 100;
                     }
@@ -300,12 +300,16 @@ public class FullSearchParser extends AbstractSearchParser {
             if (qName.equals("br")) {
                 this.stage = 42;
             }
+            if (qName.equals("a")) {
+                this.stage = 43;
+            }
             break;
         case 42:
             if (qName.equals("span")) {
                 this.stage = 43;
             }
             break;
+        case 43:
         case 44:
             if (qName.equals("img")) {
                 src = atts.getValue("src");
@@ -315,11 +319,14 @@ public class FullSearchParser extends AbstractSearchParser {
                     this.endStory();
                     this.stage = 0;
                 } else {
-                    final String id = src.substring(46, src.lastIndexOf('.'));
-                    for (final Character character : Character.values()) {
-                        if (id.equals(getImageId(character))) {
-                            this.characters.add(character);
-                            break;
+                    final int i = src.lastIndexOf('.');
+                    if (i > 46) {
+                        final String id = src.substring(46, i);
+                        for (final Character character : Character.values()) {
+                            if (id.equals(getImageId(character))) {
+                                this.characters.add(character);
+                                break;
+                            }
                         }
                     }
                 }
@@ -490,11 +497,11 @@ public class FullSearchParser extends AbstractSearchParser {
             break;
         case 40:
             this.getCurrentBuilder().firstPostedDate(this.parseDate(asString));
+            this.characters = EnumSet.noneOf(Character.class);
             this.stage = 41;
             break;
         case 43:
             this.getCurrentBuilder().modificationDate(this.parseDate(asString));
-            this.characters = EnumSet.noneOf(Character.class);
             this.stage = 44;
             break;
         }
@@ -504,7 +511,7 @@ public class FullSearchParser extends AbstractSearchParser {
         try {
             return this.fimfictionDateFormat.parse(date.replaceAll("(st|nd|rd|th)", "")).getTime();
         } catch (final ParseException e) {
-            throw new SAXException(e);
+            return 0L;
         }
     }
     

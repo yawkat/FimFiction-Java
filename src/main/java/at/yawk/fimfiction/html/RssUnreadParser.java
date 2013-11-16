@@ -88,7 +88,6 @@ public class RssUnreadParser extends AbstractSearchParser {
         // calls of this method, but so far this only happened to me for
         // description which is concatenated anyway.
         final String asString = new String(ch, start, length);
-        System.out.println("Stage: " + this.stage);
         switch (this.stage) {
         case TITLE:
             this.getCurrentBuilder().title(asString);
