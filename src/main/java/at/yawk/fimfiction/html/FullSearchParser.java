@@ -739,7 +739,7 @@ public class FullSearchParser extends AbstractSearchParser {
         case FLEUR_DE_LIS:
             return "fleur_de_lis";
         case COLGATE:
-            return "colgate";
+            return "colgateicon";
         case THUNDERLANE:
             return "thunderlane";
         case FLITTER_AND_CLOUDCHASER:
