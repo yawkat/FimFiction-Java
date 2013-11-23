@@ -100,7 +100,7 @@ public class SearchRequest extends AbstractRequest<List<Story>> {
         if (this.doGetPerspective() == null) {
             throw new IllegalStateException("User not given");
         }
-        final URL feedUrl = new URL(Util.BASE_URL + "/rss/tracking.php?user=" + this.getPerspective().getId());
+        final URL feedUrl = new URL(Util.BASE_URL + "/rss/tracking.php?user=" + this.doGetPerspective().getId());
         @Cleanup final Reader reader = new BufferedReader(new InputStreamReader(feedUrl.openStream(), "UTF-8"));
         return new RssUnreadParser().parse(reader);
     }
@@ -126,19 +126,19 @@ public class SearchRequest extends AbstractRequest<List<Story>> {
         result.append("&order=");
         result.append(SearchRequestUtil.orderToParameterString(this.getParameters().getOrder()));
         for (final Category included : this.getParameters().getIncludedCategories()) {
-            result.append("&tags[]=category:");
+            result.append("&tags[]=category%3A");
             result.append(SearchRequestUtil.categoryToParameterString(included));
         }
         for (final Category excluded : this.getParameters().getExcludedCategories()) {
-            result.append("&tags[]=-category:");
+            result.append("&tags[]=-category%3A");
             result.append(SearchRequestUtil.categoryToParameterString(excluded));
         }
         for (final Character included : this.getParameters().getIncludedCharacters()) {
-            result.append("&tags[]=character:");
+            result.append("&tags[]=character%3A");
             result.append(SearchRequestUtil.getCharacterId(included));
         }
         for (final Character excluded : this.getParameters().getExcludedCharacters()) {
-            result.append("&tags[]=-character:");
+            result.append("&tags[]=-character%3A");
             result.append(SearchRequestUtil.getCharacterId(excluded));
         }
         result.append("&content_rating=");
