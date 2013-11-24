@@ -756,6 +756,8 @@ public class FullSearchParser extends AbstractSearchParser {
             return "flower_ponies";
         case RAINDROPS:
             return "raindrops";
+        case CLOUDKICKER:
+            return "cloudkicker";
         case SPA_PONIES:
             return "spa_ponies";
         case OTHER:

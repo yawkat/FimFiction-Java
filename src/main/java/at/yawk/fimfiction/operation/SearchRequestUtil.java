@@ -244,6 +244,8 @@ class SearchRequestUtil {
             return 99;
         case SUNSET_SHIMMER:
             return 95;
+        case CLOUDKICKER:
+            return 101;
         default:
             throw new IllegalArgumentException();
         }

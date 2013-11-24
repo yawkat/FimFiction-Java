@@ -103,6 +103,7 @@ public enum Character {
     RAINDROPS,
     SPA_PONIES,
     SPARKLER,
+    CLOUDKICKER,
     ORIGINAL_CHARACTER,
     OTHER;
 }
