@@ -1,15 +1,26 @@
 package at.yawk.fimfiction;
 
 import java.io.ByteArrayOutputStream;
+import java.lang.reflect.Method;
+import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import lombok.SneakyThrows;
+
+import org.ccil.cowan.tagsoup.Parser;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.DefaultHandler;
 
 import at.yawk.fimfiction.Story.FavoriteState;
+import at.yawk.fimfiction.html.FullSearchParser;
 import at.yawk.fimfiction.operation.AbstractDownloadOperation.DownloadType;
 import at.yawk.fimfiction.operation.ChapterDownloadOperation;
 import at.yawk.fimfiction.operation.DiscardSessionOperation;
@@ -285,6 +296,31 @@ public class OperationTests {
         this.session.executeOperation(op);
         
         Assert.assertEquals(10, op.getResult().size());
+    }
+    
+    @Test
+    public void testAllCharactersImplemented() throws Exception {
+        final Method method = FullSearchParser.class.getDeclaredMethod("getImageId", Character.class);
+        method.setAccessible(true);
+        final XMLReader reader = new Parser();
+        reader.setContentHandler(new DefaultHandler() {
+            @Override
+            @SneakyThrows
+            public void startElement(final String uri, final String localName, final String qName, final Attributes atts) throws SAXException {
+                if (qName.equals("img") && atts.getValue("src") != null && atts.getValue("src").startsWith("//www.fimfiction-static.net/images/characters/")) {
+                    String imageId = atts.getValue("src").substring(46);
+                    imageId = imageId.substring(0, imageId.indexOf('.'));
+                    for (final Character character : Character.values()) {
+                        if (method.invoke(null, character).equals(imageId)) {
+                            // we're good
+                            return;
+                        }
+                    }
+                    Assert.fail("Unknown character ID: " + imageId);
+                }
+            }
+        });
+        reader.parse(new InputSource(new URL("http://www.fimfiction.net/index.php?view=category").openStream()));
     }
     
     private static String md5(final byte... data) throws NoSuchAlgorithmException {
