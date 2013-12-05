@@ -249,7 +249,7 @@ public class FullSearchParser extends AbstractSearchParser {
             if (qName.equals("img")) {
                 this.chapter.unread("//www.fimfiction-static.net/images/icons/new.png".equals(atts.getValue("src")));
                 this.stage = 31;
-            } else {
+            } else if (qName.equals("a")) {
                 try {
                     this.chapter.url(new URL("http://www.fimfiction.net" + atts.getValue("href")));
                 } catch (final MalformedURLException e) {
@@ -313,24 +313,24 @@ public class FullSearchParser extends AbstractSearchParser {
         case 44:
             if (qName.equals("img")) {
                 src = atts.getValue("src");
-                if ("//www.fimfiction-static.net/images/icons/white/error.png".equals(src)) {
-                    this.getCurrentBuilder().characters(Collections.unmodifiableSet(this.characters));
-                    this.characters = null;
-                    this.endStory();
-                    this.stage = 0;
-                } else {
-                    final int i = src.lastIndexOf('.');
-                    if (i > 46) {
-                        final String id = src.substring(46, i);
-                        for (final Character character : Character.values()) {
-                            if (id.equals(getImageId(character))) {
-                                this.characters.add(character);
-                                break;
-                            }
+                final int i = src.lastIndexOf('.');
+                if (i > 46) {
+                    final String id = src.substring(46, i);
+                    for (final Character character : Character.values()) {
+                        if (id.equals(getImageId(character))) {
+                            this.characters.add(character);
+                            break;
                         }
                     }
                 }
             }
+            if (qName.equals("i")) {
+                this.getCurrentBuilder().characters(Collections.unmodifiableSet(this.characters));
+                this.characters = null;
+                this.endStory();
+                this.stage = 0;
+            }
+            ;
             break;
         }
     }

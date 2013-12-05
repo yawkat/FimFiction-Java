@@ -309,14 +309,16 @@ public class OperationTests {
             public void startElement(final String uri, final String localName, final String qName, final Attributes atts) throws SAXException {
                 if (qName.equals("img") && atts.getValue("src") != null && atts.getValue("src").startsWith("//www.fimfiction-static.net/images/characters/")) {
                     String imageId = atts.getValue("src").substring(46);
-                    imageId = imageId.substring(0, imageId.indexOf('.'));
-                    for (final Character character : Character.values()) {
-                        if (method.invoke(null, character).equals(imageId)) {
-                            // we're good
-                            return;
+                    if (!imageId.isEmpty()) {
+                        imageId = imageId.substring(0, imageId.indexOf('.'));
+                        for (final Character character : Character.values()) {
+                            if (method.invoke(null, character).equals(imageId)) {
+                                // we're good
+                                return;
+                            }
                         }
+                        Assert.fail("Unknown character ID: " + imageId);
                     }
-                    Assert.fail("Unknown character ID: " + imageId);
                 }
             }
         });
