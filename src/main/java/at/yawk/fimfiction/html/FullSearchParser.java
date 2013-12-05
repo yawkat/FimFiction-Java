@@ -246,8 +246,8 @@ public class FullSearchParser extends AbstractSearchParser {
             break;
         case 30:
             this.chapter = Chapter.builder();
-            if (qName.equals("img")) {
-                this.chapter.unread("//www.fimfiction-static.net/images/icons/new.png".equals(atts.getValue("src")));
+            if (qName.equals("i")) {
+                this.chapter.unread(atts.getValue("class").length() == 17);
                 this.stage = 31;
             } else if (qName.equals("a")) {
                 try {
