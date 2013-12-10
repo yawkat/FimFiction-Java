@@ -200,7 +200,7 @@ public class OperationTests {
     }
     
     @Test
-    public void testMetaWeb() throws Exception {
+    public void testMetaWeb1() throws Exception {
         final GetStoryMetaOperation op = new GetStoryMetaOperation(Story.builder().id(STORY_ID).build());
         op.setRequestMethod(GetStoryMetaOperation.RequestMethod.WEB);
         this.session.executeOperation(op);
@@ -222,6 +222,16 @@ public class OperationTests {
         Assert.assertEquals(STORY_WORD_COUNT, op.getResult().getWordCount());
         Assert.assertEquals(CHAPTER_ID, op.getResult().getChapters().get(0).getId());
         Assert.assertEquals(CHAPTER_URL, op.getResult().getChapters().get(0).getUrl().toString());
+    }
+    
+    @Test
+    public void testMetaWeb2() throws Exception {
+        final GetStoryMetaOperation op = new GetStoryMetaOperation(Story.builder().id(14411).build());
+        op.setRequestMethod(GetStoryMetaOperation.RequestMethod.WEB);
+        this.session.executeOperation(op);
+        
+        Assert.assertTrue(op.getResult().isGore());
+        Assert.assertTrue(op.getResult().isSex());
     }
     
     @Test
