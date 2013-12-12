@@ -53,7 +53,11 @@ public class LoginOperation extends AbstractRequest<LoginOperation.Result> {
         final OutputStream post = connection.getOutputStream();
         try {
             // username & password, escaped
-            post.write(new StringBuilder("username=").append(URLEncoder.encode(this.username, "UTF-8")).append("&password=").append(URLEncoder.encode(this.password, "UTF-8")).toString().getBytes());
+            final StringBuilder message = new StringBuilder("keep_logged_in=1&username=");
+            message.append(URLEncoder.encode(this.username, "UTF-8"));
+            message.append("&password=");
+            message.append(URLEncoder.encode(this.password, "UTF-8"));
+            post.write(message.toString().getBytes("UTF-8"));
         } finally {
             post.close();
         }
