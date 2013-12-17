@@ -126,7 +126,7 @@ public class OperationTests {
         final ChapterDownloadOperation op = new ChapterDownloadOperation(buf, DownloadType.TEXT, Chapter.builder().id(CHAPTER_ID).build());
         this.session.executeOperation(op);
         
-        Assert.assertEquals("872aa74a17a047291b848095fb606fb5", md5(buf.toByteArray()));
+        Assert.assertEquals("1165a17a66b8529e8807e04a6ece6d89", md5(buf.toByteArray()));
     }
     
     @Test
@@ -135,7 +135,7 @@ public class OperationTests {
         final ChapterDownloadOperation op = new ChapterDownloadOperation(buf, DownloadType.HTML, Chapter.builder().id(CHAPTER_ID).build());
         this.session.executeOperation(op);
         
-        Assert.assertEquals("dedeff49cfffcbfd9f7a7baba4932475", md5(buf.toByteArray()));
+        Assert.assertEquals("d600f0b0cf99f0e8a86429abe358be38", md5(buf.toByteArray()));
     }
     
     @Test
@@ -144,7 +144,7 @@ public class OperationTests {
         final StoryDownloadOperation op = new StoryDownloadOperation(buf, DownloadType.TEXT, Story.builder().id(STORY_ID).build());
         this.session.executeOperation(op);
         
-        Assert.assertEquals("087a09c7295ba475817d939e42a474e2", md5(buf.toByteArray()));
+        Assert.assertEquals("7f90351f021e4bb91e23bebf9e564c7f", md5(buf.toByteArray()));
     }
     
     @Test
@@ -153,7 +153,7 @@ public class OperationTests {
         final StoryDownloadOperation op = new StoryDownloadOperation(buf, DownloadType.HTML, Story.builder().id(STORY_ID).build());
         this.session.executeOperation(op);
         
-        Assert.assertEquals("26a4a9fd57ff576956a6835780c1a884", md5(buf.toByteArray()));
+        Assert.assertEquals("1a7240e7bc221f54a478b958c0feb1e4", md5(buf.toByteArray()));
     }
     
     @Test
