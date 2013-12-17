@@ -247,8 +247,10 @@ public class FullSearchParser extends AbstractSearchParser {
         case 30:
             this.chapter = Chapter.builder();
             if (qName.equals("i")) {
-                this.chapter.unread(atts.getValue("class").length() == 17);
-                this.stage = 31;
+                if (atts.getValue("class") != null) {
+                    this.chapter.unread(atts.getValue("class").length() == 17);
+                    this.stage = 31;
+                }
             } else if (qName.equals("a")) {
                 try {
                     this.chapter.url(new URL("http://www.fimfiction.net" + atts.getValue("href")));
@@ -430,6 +432,7 @@ public class FullSearchParser extends AbstractSearchParser {
             break;
         case 15:
             this.title.append(asString);
+            System.out.println(asString);
             break;
         case 17:
             this.authorName.append(asString);
