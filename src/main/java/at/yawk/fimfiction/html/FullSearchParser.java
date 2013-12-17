@@ -432,7 +432,6 @@ public class FullSearchParser extends AbstractSearchParser {
             break;
         case 15:
             this.title.append(asString);
-            System.out.println(asString);
             break;
         case 17:
             this.authorName.append(asString);
