@@ -1,0 +1,36 @@
+{
+    "url_thumbnail":"http://www.fimfiction-static.net/images/story_images/10_r.jpg",
+    "chapters":[
+        {
+            "id":11,
+            "title":"Accolade",
+            "date_modified":"2011-08-03T19:09Z",
+            "word_count":6947,
+            "view_count":3731,
+            "url":"http://www.fimfiction.net/story/10/1/accolade/accolade"
+        }
+    ],
+    "view_count_total":3731,
+    "id":10,
+    "author":{
+        "id":20,
+        "name":"Cereal Velocity"
+    },
+    "title":"Accolade",
+    "description_short":"",
+    "description":"Luna and Trixie both want Twilight Sparkle gone. Will teaming up solve their problem once and for all?",
+    "word_count":6947,
+    "content_rating":"everyone",
+    "view_count_maximum_chapter":3731,
+    "chapter_count":1,
+    "comment_count":26,
+    "status":"completed",
+    "dislike_count":8,
+    "url":"http://www.fimfiction.net/story/10/accolade",
+    "like_count":106,
+    "date_updated":"2011-07-11T01:25Z",
+    "categories":[
+        "comedy",
+        "romance"
+    ]
+}
