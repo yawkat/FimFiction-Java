@@ -450,7 +450,7 @@ class SearchHtmlParser extends SearchParser {
             return;
         }
         String asString = new String(ch, start, FormattedStringParser.clipWhitespace(ch, start, length, false));
-        if (asString.isEmpty()) {
+        if (asString.isEmpty() && stage != 27) {
             return;
         }
         switch (stage) {

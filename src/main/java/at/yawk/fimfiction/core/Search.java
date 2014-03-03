@@ -164,8 +164,9 @@ public class Search {
             result.set(SearchResult.SearchResultKey.STORIES, searchParser.finishedStories);
             if (searchParser instanceof SearchHtmlParser) {
                 SearchHtmlParser searchHtmlParser = (SearchHtmlParser) searchParser;
-                assert searchHtmlParser.loggedIn != null;
-                result.set(SearchResult.SearchResultKey.LOGGED_IN_USER, searchHtmlParser.loggedIn);
+                if (searchHtmlParser.loggedIn != null) {
+                    result.set(SearchResult.SearchResultKey.LOGGED_IN_USER, searchHtmlParser.loggedIn);
+                }
                 result.set(SearchResult.SearchResultKey.LOGOUT_NONCE,
                            searchHtmlParser.nonce == null ?
                                    Optional.missing(String.class) :

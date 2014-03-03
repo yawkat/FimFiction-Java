@@ -73,14 +73,12 @@ public class FormattedStringParser {
         for (; i < start + length; i++) {
             if (ch[i] == ' ' | ch[i] == '\n' | ch[i] == '\r' | ch[i] == '\t') {
                 if (keepStart) {
-                    ch[j] = ' ';
+                    ch[j++] = ' ';
                     keepStart = false;
-                    j++;
                 }
             } else {
+                ch[j++] = ch[i];
                 keepStart = true;
-                ch[j] = ch[i];
-                j++;
             }
         }
         return j;
@@ -92,7 +90,7 @@ public class FormattedStringParser {
         @Override
         public void startElement(String uri, String localName, String qName, Attributes attributes)
                 throws SAXException {
-            if ("br".equals(qName)) {
+            if ("br".equals(qName) || "p".equals(qName)) {
                 builder.append('\n');
             } else if ("b".equals(qName)) {
                 builder.append(FormattedString.SimpleFormatting.BOLD, true);
@@ -104,8 +102,6 @@ public class FormattedStringParser {
                 builder.append(FormattedString.SimpleFormatting.BOLD, true);
             } else if ("u".equals(qName)) {
                 builder.append(FormattedString.SimpleFormatting.BOLD, true);
-            } else if ("br".equals(qName)) {
-                builder.append('\n');
             }
         }
 
@@ -127,10 +123,7 @@ public class FormattedStringParser {
         @Override
         public void characters(char[] ch, int start, int length) throws SAXException {
             int l = builder.length();
-            int j = clipWhitespace(ch,
-                                   start,
-                                   length,
-                                   l > 0 && builder.charAt(l - 1) != ' ');
+            int j = clipWhitespace(ch, start, length, l > 0 && builder.charAt(l - 1) != ' ');
             builder.append(ch, start, j - start);
         }
     }
