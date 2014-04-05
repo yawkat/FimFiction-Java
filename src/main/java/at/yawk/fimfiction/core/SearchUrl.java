@@ -176,6 +176,10 @@ public class SearchUrl {
                 }
             }
 
+            if(p.has(PUBLISH_TIMEFRAME)) {
+                result.append("published_timeframe=").append(p.<Timeframe>get(PUBLISH_TIMEFRAME).getFimfictionId());
+            }
+
             result.append("&page="); // the page number will be appended in #build()
 
             return new CompiledSearchParameters(result.toString());

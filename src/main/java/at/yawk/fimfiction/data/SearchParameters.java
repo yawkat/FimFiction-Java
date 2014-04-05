@@ -56,7 +56,8 @@ public class SearchParameters extends EnumKeyBundle<SearchParameters, SearchPara
         UNREAD("unread", ValueType.BOOLEAN),
         FAVORITED("favorited", ValueType.BOOLEAN),
         READ_LATER("read_later", ValueType.BOOLEAN),
-        USER("user", ValueType.USER);
+        USER("user", ValueType.USER),
+        PUBLISH_TIMEFRAME("publish_timeframe", ValueType.TIMEFRAME);
 
         @Nullable
         public static SearchParameter findKey(@Nonnull String id) {

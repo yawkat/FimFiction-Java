@@ -137,6 +137,7 @@ public class Deserializer {
         if (type == Category.class) { return (I) Category.forId(id); }
         if (type == ContentRating.class) { return (I) ContentRating.forId(id); }
         if (type == FimCharacter.class) { return (I) FimCharacter.DefaultCharacter.forId(id); }
+        if (type == Timeframe.class) { return (I) Timeframe.DefaultTimeframe.forId(id); }
         if (type == Order.class) { return (I) Order.forId(id); }
         if (type == Rating.class) { return (I) Rating.forId(id); }
         if (type == StoryStatus.class) { return (I) StoryStatus.forId(id); }

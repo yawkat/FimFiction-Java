@@ -82,6 +82,11 @@ public enum ValueType {
      * A Category enum constant.
      */
     CATEGORY(Category.class),
+    /**
+     * A Timeframe (not necessarily a DefaultTimeframe!).
+     */
+    TIMEFRAME(Timeframe.class),
+
 
     /**
      * An Optional instance with a User as the element.
@@ -195,6 +200,7 @@ public enum ValueType {
         case RATING:
         case CHARACTER:
         case CATEGORY:
+        case TIMEFRAME:
             return original;
         case DATE:
             return ((Date) original).clone();
