@@ -196,6 +196,8 @@ public class SearchUrl {
                 return "views";
             case WORD_COUNT:
                 return "words";
+            case RATING:
+                return "top";
             default:
                 return order.getId();
             }
