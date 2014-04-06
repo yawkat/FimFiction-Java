@@ -78,15 +78,19 @@ public class FormattedString implements CharSequence {
         StringBuilder result = new StringBuilder();
         int textPosition = 0;
         for (Tag tag : tags) {
-            if (markup == Markup.HTML) {
-                result.append(StringEscapeUtils.escapeHtml(subSequence(textPosition, tag.index).toString())
-                                               .replace("\n", "<br/>"));
-            } else { result.append(subSequence(textPosition, tag.index)); }
+            result.append(transformText(markup, subSequence(textPosition, tag.index)));
             textPosition = tag.index;
             result.append(tag.getTag(markup));
         }
-        result.append(subSequence(textPosition, length()));
+        result.append(transformText(markup, subSequence(textPosition, length())));
         return result.toString();
+    }
+
+    private CharSequence transformText(Markup markup, CharSequence sequence) {
+        if (markup == Markup.HTML) {
+            sequence = StringEscapeUtils.escapeHtml(sequence.toString()).replace("\n", "<br/>");
+        }
+        return sequence;
     }
 
     /**
