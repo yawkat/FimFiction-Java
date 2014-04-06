@@ -78,7 +78,7 @@ public class FormattedStringParser {
         public void startElement(String uri, String localName, String qName, Attributes attributes)
                 throws SAXException {
             if ("br".equals(qName) || "p".equals(qName)) {
-                builder.append('\n');
+                if (builder.length() > 0) { builder.append('\n'); }
             } else if ("b".equals(qName)) {
                 builder.append(FormattedString.SimpleFormatting.BOLD, true);
             } else if ("i".equals(qName)) {
