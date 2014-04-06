@@ -64,28 +64,15 @@ public class FormattedStringParser {
         FormattedStringHandler handler = new FormattedStringHandler();
         reader.setContentHandler(handler);
         reader.parse(new InputSource(new StringReader(val)));
-        return handler.builder.build();
-    }
-
-    static int clipWhitespace(char[] ch, int start, int length, boolean keepStart) {
-        int i = start;
-        int j = i;
-        for (; i < start + length; i++) {
-            if (ch[i] == ' ' | ch[i] == '\n' | ch[i] == '\r' | ch[i] == '\t') {
-                if (keepStart) {
-                    ch[j++] = ' ';
-                    keepStart = false;
-                }
-            } else {
-                ch[j++] = ch[i];
-                keepStart = true;
-            }
-        }
-        return j;
+        return handler.build();
     }
 
     static class FormattedStringHandler extends DefaultHandler {
-        final FormattedString.FormattedStringBuilder builder = FormattedString.builder();
+        private final FormattedString.FormattedStringBuilder builder = FormattedString.builder();
+
+        public FormattedString build() {
+            return builder.build();
+        }
 
         @Override
         public void startElement(String uri, String localName, String qName, Attributes attributes)
@@ -122,9 +109,14 @@ public class FormattedStringParser {
 
         @Override
         public void characters(char[] ch, int start, int length) throws SAXException {
-            int l = builder.length();
-            int j = clipWhitespace(ch, start, length, l > 0 && builder.charAt(l - 1) != ' ');
-            builder.append(ch, start, j - start);
+            // clip leading whitespace
+            if (builder.length() == 0) {
+                while (length > 0 && SearchHtmlParser.isWhitespace(ch[start])) {
+                    length--;
+                    start++;
+                }
+            }
+            builder.append(ch, start, length);
         }
     }
 }

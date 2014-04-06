@@ -9,11 +9,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.xml.sax.Attributes;
@@ -337,8 +333,8 @@ class SearchHtmlParser extends SearchParser {
                 src = attributes.getValue("src");
                 try {
                     assert characters != null;
-                    characters.add(FimCharacter.DefaultCharacter
-                                               .getOrCreateCharacter(characterId, new URL("http:" + src)));
+                    characters.add(FimCharacter.DefaultCharacter.getOrCreateCharacter(characterId,
+                                                                                      new URL("http:" + src)));
                 } catch (MalformedURLException e) {
                     throw new SAXException(e);
                 }
@@ -390,7 +386,7 @@ class SearchHtmlParser extends SearchParser {
             assert description != null;
             if ("div".equals(qName)) {
                 assert story != null;
-                story.set(DESCRIPTION, description.builder.build());
+                story.set(DESCRIPTION, description.build());
                 description = null;
                 stage = 28;
             } else {
@@ -453,7 +449,7 @@ class SearchHtmlParser extends SearchParser {
             }
             return;
         }
-        String asString = new String(ch, start, FormattedStringParser.clipWhitespace(ch, start, length, false));
+        String asString = new String(ch, start, clipWhitespace(ch, start, length));
         if (asString.isEmpty() && stage != 27) {
             return;
         }
@@ -628,4 +624,24 @@ class SearchHtmlParser extends SearchParser {
             throw new IllegalArgumentException(category.name());
         }
     }
+
+    private static int clipWhitespace(char[] ch, int start, int length) {
+        boolean white = false;
+        int i = start;
+        int j = i;
+        for (; i < start + length; i++) {
+            if (isWhitespace(ch[i])) {
+                if (!white) {
+                    ch[j++] = ' ';
+                    white = true;
+                }
+            } else {
+                ch[j++] = ch[i];
+                white = false;
+            }
+        }
+        return j;
+    }
+
+    static boolean isWhitespace(char c) { return c == ' ' || c == '\n' || c == '\r' || c == '\t'; }
 }
