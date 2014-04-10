@@ -43,13 +43,21 @@ public class FormattedStringParser {
             if (tag.startsWith("size=")) {
                 try {
                     FormattedString.SizeUnit unit = FormattedString.SizeUnit.PX;
+                    String num;
                     if (tag.endsWith("em")) {
                         unit = FormattedString.SizeUnit.EM;
+                        num = tag.substring(5, tag.length() - 2);
                     } else if (tag.endsWith("pt")) {
                         unit = FormattedString.SizeUnit.PT;
+                        num = tag.substring(5, tag.length() - 2);
+                    } else if (tag.endsWith("px")) {
+                        unit = FormattedString.SizeUnit.PX;
+                        num = tag.substring(5, tag.length() - 2);
+                    } else {
+                        unit = FormattedString.SizeUnit.PX;
+                        num = tag.substring(5);
                     }
-                    builder.append(FormattedString.size(Float.parseFloat(tag.substring(5, tag.length() - 2)), unit),
-                                   start);
+                    builder.append(FormattedString.size(Float.parseFloat(num), unit), start);
                 } catch (NumberFormatException ignored) {}
             } else if ("size".equals(tag)) {
                 builder.append(FormattedString.size(0, FormattedString.SizeUnit.PX), start);
