@@ -38,7 +38,7 @@ public class AccountActions {
 
 
         HttpResponse response = NetUtil.post(httpClient,
-                                             "http://www.fimfiction.net/ajax/add_read_it_later.php",
+                                             "https://www.fimfiction.net/ajax/add_read_it_later.php",
                                              "story",
                                              story.get(Story.StoryKey.ID).toString(),
                                              "selected",
@@ -72,7 +72,7 @@ public class AccountActions {
 
 
         HttpResponse response = NetUtil.post(httpClient,
-                                             "http://www.fimfiction.net/rate.php",
+                                             "https://www.fimfiction.net/rate.php",
                                              "story",
                                              story.get(Story.StoryKey.ID).toString(),
                                              "rating",
@@ -124,7 +124,7 @@ public class AccountActions {
         FavoriteParser parser = new FavoriteParser();
 
         HttpResponse response = NetUtil.post(httpClient,
-                                             "http://www.fimfiction.net/ajax/add_favourite.php",
+                                             "https://www.fimfiction.net/ajax/add_favourite.php",
                                              "story",
                                              story.get(Story.StoryKey.ID).toString(),
                                              "selected",
@@ -161,7 +161,7 @@ public class AccountActions {
         Preconditions.checkNotNull(chapter);
 
         HttpResponse response = NetUtil.post(httpClient,
-                                             "http://www.fimfiction.net/ajax/toggle_read.php",
+                                             "https://www.fimfiction.net/ajax/toggle_read.php",
                                              "chapter",
                                              chapter.get(Chapter.ChapterKey.ID).toString());
 

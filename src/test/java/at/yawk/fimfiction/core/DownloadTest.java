@@ -14,7 +14,7 @@ public class DownloadTest {
     @Test
     public void testGetStoryDownloadUrlText() throws Exception {
         for (int i = 0; i < 200000; i++) {
-            assertEquals(new URL("http://www.fimfiction.net/download_story.php?story=" + i),
+            assertEquals(new URL("https://www.fimfiction.net/download_story.php?story=" + i),
                          Download.getStoryDownloadUrl(Story.createMutable().set(Story.StoryKey.ID, i),
                                                       Download.Format.TEXT));
         }
@@ -23,7 +23,7 @@ public class DownloadTest {
     @Test
     public void testGetStoryDownloadUrlHtml() throws Exception {
         for (int i = 0; i < 200000; i++) {
-            assertEquals(new URL("http://www.fimfiction.net/download_story.php?html&story=" + i),
+            assertEquals(new URL("https://www.fimfiction.net/download_story.php?html&story=" + i),
                          Download.getStoryDownloadUrl(Story.createMutable().set(Story.StoryKey.ID, i),
                                                       Download.Format.HTML));
         }
@@ -32,7 +32,7 @@ public class DownloadTest {
     @Test
     public void testGetStoryDownloadUrlEpub() throws Exception {
         for (int i = 0; i < 200000; i++) {
-            assertEquals(new URL("http://www.fimfiction.net/download_epub.php?story=" + i),
+            assertEquals(new URL("https://www.fimfiction.net/download_epub.php?story=" + i),
                          Download.getStoryDownloadUrl(Story.createMutable().set(Story.StoryKey.ID, i),
                                                       Download.Format.EPUB));
         }
@@ -41,7 +41,7 @@ public class DownloadTest {
     @Test
     public void testGetChapterDownloadUrlText() throws Exception {
         for (int i = 0; i < 200000; i++) {
-            assertEquals(new URL("http://www.fimfiction.net/download_chapter.php?chapter=" + i),
+            assertEquals(new URL("https://www.fimfiction.net/download_chapter.php?chapter=" + i),
                          Download.getChapterDownloadUrl(Chapter.createMutable().set(Chapter.ChapterKey.ID, i),
                                                         Download.Format.TEXT));
         }
@@ -50,7 +50,7 @@ public class DownloadTest {
     @Test
     public void testGetChapterDownloadUrlHtml() throws Exception {
         for (int i = 0; i < 200000; i++) {
-            assertEquals(new URL("http://www.fimfiction.net/download_chapter.php?html&chapter=" + i),
+            assertEquals(new URL("https://www.fimfiction.net/download_chapter.php?html&chapter=" + i),
                          Download.getChapterDownloadUrl(Chapter.createMutable().set(Chapter.ChapterKey.ID, i),
                                                         Download.Format.HTML));
         }

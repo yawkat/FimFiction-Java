@@ -122,7 +122,7 @@ public class Search {
     @Nonnull
     public Search unreadFeed(int user) {
         this.mode = MODE_UNREAD_FEED;
-        return url(NetUtil.createUrlNonNull("http://www.fimfiction.net/rss/tracking.php?user=" + user));
+        return url(NetUtil.createUrlNonNull("https://www.fimfiction.net/rss/tracking.php?user=" + user));
     }
 
     /**

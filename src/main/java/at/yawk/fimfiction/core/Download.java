@@ -26,11 +26,11 @@ public class Download {
         int id = story.get(Story.StoryKey.ID);
         switch (format) {
         case TEXT:
-            return NetUtil.createUrlNonNull("http://www.fimfiction.net/download_story.php?story=" + id);
+            return NetUtil.createUrlNonNull("https://www.fimfiction.net/download_story.php?story=" + id);
         case HTML:
-            return NetUtil.createUrlNonNull("http://www.fimfiction.net/download_story.php?html&story=" + id);
+            return NetUtil.createUrlNonNull("https://www.fimfiction.net/download_story.php?html&story=" + id);
         case EPUB:
-            return NetUtil.createUrlNonNull("http://www.fimfiction.net/download_epub.php?story=" + id);
+            return NetUtil.createUrlNonNull("https://www.fimfiction.net/download_epub.php?story=" + id);
         default:
             throw new UnsupportedOperationException("Cannot download a story as " + format);
         }
@@ -50,9 +50,9 @@ public class Download {
         int id = chapter.get(Chapter.ChapterKey.ID);
         switch (format) {
         case TEXT:
-            return NetUtil.createUrlNonNull("http://www.fimfiction.net/download_chapter.php?chapter=" + id);
+            return NetUtil.createUrlNonNull("https://www.fimfiction.net/download_chapter.php?chapter=" + id);
         case HTML:
-            return NetUtil.createUrlNonNull("http://www.fimfiction.net/download_chapter.php?html&chapter=" + id);
+            return NetUtil.createUrlNonNull("https://www.fimfiction.net/download_chapter.php?html&chapter=" + id);
         default:
             throw new UnsupportedOperationException("Cannot download a story as " + format);
         }
