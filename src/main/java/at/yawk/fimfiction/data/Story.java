@@ -158,11 +158,17 @@ public class Story extends EnumKeyBundle<Story, Story.StoryKey> {
 
         /**
          * Current favorite state the user has assigned to this Story.
+         *
+         * @deprecated Replaced by shelf system.
          */
+        @Deprecated
         FAVORITE_STATE("favorite_state", ValueType.FAVORITE_STATE),
         /**
          * Read later flag for this Story for this User.
+         *
+         * @deprecated Replaced by shelf system.
          */
+        @Deprecated
         READ_LATER_STATE("read_later_state", ValueType.BOOLEAN),
         /**
          * Rating this User has given this Story.
@@ -171,7 +177,15 @@ public class Story extends EnumKeyBundle<Story, Story.StoryKey> {
         /**
          * Rating token String used for rating this story.
          */
-        RATING_TOKEN("rating_token", ValueType.STRING);
+        RATING_TOKEN("rating_token", ValueType.STRING),
+        /**
+         * Shelves this story is part of.
+         */
+        SHELVES_ADDED("shelves_added", ValueType.SET_SHELF),
+        /**
+         * Shelves this story is not part of.
+         */
+        SHELVES_NOT_ADDED("shelves_not_added", ValueType.SET_SHELF);
 
         /**
          * @return The story key associated to the given ID or null if no such key exists.

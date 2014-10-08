@@ -7,7 +7,9 @@ import javax.annotation.Nullable;
  * Favorite state for a story (unique for each user).
  *
  * @author Jonas Konrad (yawkat)
+ * @deprecated Replaced by shelf API.
  */
+@Deprecated
 public enum FavoriteState implements Identifiable {
     /**
      * The user has not favorited this story.

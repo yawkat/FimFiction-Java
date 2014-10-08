@@ -54,10 +54,19 @@ public class SearchParameters extends EnumKeyBundle<SearchParameters, SearchPara
         WORD_COUNT_MAXIMUM("word_count_maximum", ValueType.NUMBER),
         WORD_COUNT_MINIMUM("word_count_minimum", ValueType.NUMBER),
         UNREAD("unread", ValueType.BOOLEAN),
+        /**
+         * @deprecated Not functional anymore, use shelf API.
+         */
+        @Deprecated
         FAVORITED("favorited", ValueType.BOOLEAN),
+        /**
+         * @deprecated Not functional anymore, use shelf API.
+         */
+        @Deprecated
         READ_LATER("read_later", ValueType.BOOLEAN),
         USER("user", ValueType.USER),
-        PUBLISH_TIMEFRAME("publish_timeframe", ValueType.TIMEFRAME);
+        PUBLISH_TIMEFRAME("publish_timeframe", ValueType.TIMEFRAME),
+        SHELF("shelf", ValueType.SHELF);
 
         @Nullable
         public static SearchParameter findKey(@Nonnull String id) {

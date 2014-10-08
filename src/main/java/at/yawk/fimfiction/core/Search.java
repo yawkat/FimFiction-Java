@@ -171,6 +171,9 @@ public class Search {
                            searchHtmlParser.nonce == null ?
                                    Optional.missing(String.class) :
                                    Optional.existing(searchHtmlParser.nonce));
+                if (searchHtmlParser.globalShelves != null) {
+                    result.set(SearchResult.SearchResultKey.SHELVES, searchHtmlParser.globalShelves);
+                }
             }
             return result;
         } finally {

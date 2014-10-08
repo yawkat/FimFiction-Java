@@ -41,7 +41,8 @@ public class SearchResult extends EnumKeyBundle<SearchResult, SearchResult.Searc
     public static enum SearchResultKey implements Key {
         STORIES("stories", ValueType.LIST_STORY),
         LOGGED_IN_USER("logged_in_user", ValueType.OPTIONAL_USER),
-        LOGOUT_NONCE("logout_nonce", ValueType.OPTIONAL_STRING);
+        LOGOUT_NONCE("logout_nonce", ValueType.OPTIONAL_STRING),
+        SHELVES("shelves", ValueType.SET_SHELF);
 
         @Nullable
         public static SearchResultKey findKey(@Nonnull String id) {

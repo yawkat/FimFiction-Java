@@ -75,6 +75,10 @@ public enum ValueType {
      */
     STORY(Story.class),
     /**
+     * A Shelf bundle.
+     */
+    SHELF(Shelf.class),
+    /**
      * A FimCharacter (not necessarily a DefaultCharacter!).
      */
     CHARACTER(FimCharacter.class),
@@ -109,6 +113,10 @@ public enum ValueType {
      * A list of Story instances.
      */
     LIST_STORY(List.class, STORY),
+    /**
+     * A set of Shelf instances.
+     */
+    SET_SHELF(Set.class, SHELF),
     /**
      * A set of FimCharacter instances.
      */
@@ -208,6 +216,7 @@ public enum ValueType {
         case STORY_STATUS:
         case CHAPTER:
         case STORY:
+        case SHELF:
             return ((Bundle) original).immutableCopy();
         case OPTIONAL_USER:
         case OPTIONAL_URL:

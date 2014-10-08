@@ -143,9 +143,7 @@ public class SearchUrl {
                 result.append("&maximum_words=").append(p.getInt(WORD_COUNT_MAXIMUM) + 1);
             }
 
-            if (p.getBoolean(FAVORITED, false)) { result.append("&tracking=1"); }
             if (p.getBoolean(UNREAD, false)) { result.append("&unread=1"); }
-            if (p.getBoolean(READ_LATER, false)) { result.append("&read_it_later=1"); }
 
             if (p.has(CONTENT_RATING)) {
                 result.append("&content_rating=").append(p.<ContentRating>get(CONTENT_RATING).ordinal());
@@ -176,8 +174,12 @@ public class SearchUrl {
                 }
             }
 
-            if(p.has(PUBLISH_TIMEFRAME)) {
+            if (p.has(PUBLISH_TIMEFRAME)) {
                 result.append("&published_timeframe=").append(p.<Timeframe>get(PUBLISH_TIMEFRAME).getFimfictionId());
+            }
+
+            if (p.has(SHELF)) {
+                result.append("&bookshelf=").append(p.<Shelf>get(SHELF).getInt(Shelf.ShelfKey.ID));
             }
 
             result.append("&page="); // the page number will be appended in #build()

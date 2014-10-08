@@ -1,12 +1,14 @@
 package at.yawk.fimfiction.core;
 
-import at.yawk.fimfiction.data.Chapter;
-import at.yawk.fimfiction.data.FavoriteState;
-import at.yawk.fimfiction.data.Rating;
-import at.yawk.fimfiction.data.Story;
+import at.yawk.fimfiction.data.*;
 import at.yawk.fimfiction.net.NetUtil;
 import com.google.common.base.Preconditions;
+import com.google.gson.stream.JsonReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 import javax.annotation.Nonnull;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -28,32 +30,19 @@ public class AccountActions {
     /**
      * Sets the read later flag for a story for this user.
      *
-     * @return The modified flags for this story (for example the read later status) without any information from the
-     *         given story bundle.
+     * <b>Fails silently if no read later shelf is known; use the shelf API instead!</b>
+     *
+     * @return The modified story.
+     * @deprecated Replaced with shelf API.
      */
+    @Deprecated
     public static Story setReadLater(@Nonnull HttpClient httpClient, @Nonnull Story story, boolean readLater)
             throws MissingKeyException, IOException, SAXException {
-        Preconditions.checkNotNull(httpClient);
-        Preconditions.checkNotNull(story);
-
-
-        HttpResponse response = NetUtil.post(httpClient,
-                                             Constants.BASE_URL + "/ajax/add_read_it_later.php",
-                                             "story",
-                                             story.get(Story.StoryKey.ID).toString(),
-                                             "selected",
-                                             readLater ? "1" : "0");
-
-        ReadLaterParser parser = new ReadLaterParser();
-        try {
-            XMLReader xmlReader = new Parser();
-            xmlReader.setContentHandler(parser);
-            xmlReader.parse(new InputSource(response.getEntity().getContent()));
-
-            return Story.createMutable().set(Story.StoryKey.READ_LATER_STATE, parser.selected);
-        } finally {
-            NetUtil.close(response);
+        Shelf shelf = LegacySupport.findShelf(story, LegacySupport.READ_IT_LATER);
+        if (shelf != null) {
+            story = setShelf(httpClient, story, shelf, readLater);
         }
+        return story;
     }
 
     /**
@@ -96,56 +85,76 @@ public class AccountActions {
     }
 
     /**
-     * Sets the favorite status for a story for this user. This might send multiple HTTP requests to finish.
+     * Sets the favorite status for a story for this user.
      *
-     * @return The modified flags for this story (for example the favorite status) without any information from the
-     *         given story bundle.
+     * <b>Fails silently if no favorite shelf is known; use the shelf API instead!</b>
+     *
+     * @return The modified story.
+     * @deprecated Replaced with shelf API.
      */
+    @Deprecated
     public static Story setFavorite(@Nonnull HttpClient connectionFactory,
                                     @Nonnull Story story,
                                     @Nonnull FavoriteState state) throws IOException, SAXException {
-        if (state == FavoriteState.FAVORITED_WITH_EMAIL) {
-            setFavorite0(connectionFactory, story, FavoriteState.FAVORITED);
-            return setFavorite0(connectionFactory, story, FavoriteState.FAVORITED_WITH_EMAIL);
-        } else {
-            return setFavorite0(connectionFactory, story, state);
+        Shelf shelf = LegacySupport.findShelf(story, LegacySupport.FAVORITES);
+        if (shelf != null) {
+            story = setShelf(connectionFactory, story, shelf, state.isFavorited());
         }
+        return story;
     }
 
-    @Nonnull
-    private static Story setFavorite0(@Nonnull HttpClient httpClient,
-                                      @Nonnull Story story,
-                                      @Nonnull FavoriteState state)
-            throws MissingKeyException, IOException, SAXException {
+    /**
+     * Set the shelf status of a story (add / remove). The story is updated in-place if it's mutable.
+     *
+     * @return The updated story.
+     */
+    public static Story setShelf(@Nonnull HttpClient httpClient,
+                                 @Nonnull Story story,
+                                 @Nonnull Shelf shelf,
+                                 boolean add) throws IOException {
         Preconditions.checkNotNull(httpClient);
-        Preconditions.checkNotNull(story);
-        Preconditions.checkNotNull(state);
-
-        FavoriteParser parser = new FavoriteParser();
+        Preconditions.checkNotNull(shelf);
 
         HttpResponse response = NetUtil.post(httpClient,
-                                             Constants.BASE_URL + "/ajax/add_favourite.php",
+                                             Constants.BASE_URL + "/ajax/bookshelf_items/post.php",
                                              "story",
                                              story.get(Story.StoryKey.ID).toString(),
-                                             "selected",
-                                             state.isFavorited() ? "1" : "0",
-                                             "email",
-                                             state == FavoriteState.FAVORITED_WITH_EMAIL ? "1" : "0");
+                                             "bookshelf",
+                                             shelf.get(Shelf.ShelfKey.ID).toString(),
+                                             "task",
+                                             add ? "add" : "remove");
+
+        Set<Shelf> newShelves = new HashSet<Shelf>(story.<Set<Shelf>>get(Story.StoryKey.SHELVES_ADDED));
 
         try {
-            XMLReader xmlReader = new Parser();
-            xmlReader.setContentHandler(parser);
-            xmlReader.parse(new InputSource(response.getEntity().getContent()));
-
-
-            return Story.createMutable()
-                        .set(Story.StoryKey.FAVORITE_STATE,
-                             parser.favorite ?
-                                     parser.email ? FavoriteState.FAVORITED_WITH_EMAIL : FavoriteState.FAVORITED :
-                                     FavoriteState.NOT_FAVORITED);
+            JsonReader reader = new JsonReader(new InputStreamReader(response.getEntity().getContent()));
+            reader.beginObject();
+            while (reader.hasNext()) {
+                String name = reader.nextName();
+                if (name.equals("added")) {
+                    boolean added = reader.nextBoolean();
+                    for (Iterator<Shelf> iterator = newShelves.iterator(); iterator.hasNext(); ) {
+                        Shelf shel = iterator.next();
+                        if (shel.getInt(Shelf.ShelfKey.ID) == shelf.getInt(Shelf.ShelfKey.ID)) {
+                            iterator.remove();
+                        }
+                    }
+                    if (added) {
+                        newShelves.add(shelf);
+                    }
+                } else {
+                    reader.skipValue();
+                }
+            }
+            reader.endObject();
         } finally {
             NetUtil.close(response);
         }
+
+        Story newStory = story.mutableVersion();
+        newStory.set(Story.StoryKey.SHELVES_ADDED, newShelves);
+        LegacySupport.deriveFavoriteAndReadLaterFromShelves(newStory);
+        return newStory;
     }
 
     /**
@@ -173,35 +182,6 @@ public class AccountActions {
             return Chapter.createMutable().set(Chapter.ChapterKey.UNREAD, parser.unread);
         } finally {
             NetUtil.close(response);
-        }
-    }
-}
-
-class ReadLaterParser extends DefaultHandler {
-    boolean selected;
-
-    int stage;
-
-    @Override
-    public void startElement(@Nonnull String uri,
-                             @Nonnull String localName,
-                             @Nonnull String qName,
-                             @Nonnull Attributes attributes) {
-        if ("selected".equals(qName)) {
-            this.stage = 1;
-        }
-    }
-
-    @Override
-    public void characters(@Nonnull char[] ch, int start, int length) {
-        if (this.stage != 0) {
-            int val = Integer.parseInt(new String(ch, start, length));
-            switch (this.stage) {
-            case 1:
-                this.selected = val == 1;
-                break;
-            }
-            this.stage = 0;
         }
     }
 }
@@ -247,49 +227,6 @@ class RatingParser extends DefaultHandler {
             case 4:
                 this.disliked = val == 1;
                 break;
-            }
-            this.stage = 0;
-        }
-    }
-}
-
-class FavoriteParser extends DefaultHandler {
-    boolean favorite;
-    boolean email;
-    String error;
-
-    int stage;
-
-    @Override
-    public void startElement(@Nonnull String uri,
-                             @Nonnull String localName,
-                             @Nonnull String qName,
-                             @Nonnull Attributes attributes) {
-        if ("selected".equals(qName)) {
-            this.stage = 1;
-        } else if ("email".equals(qName)) {
-            this.stage = 2;
-        } else if ("error".equals(qName)) {
-            this.stage = 3;
-        }
-    }
-
-    @Override
-    public void characters(@Nonnull char[] ch, int start, int length) throws SAXException {
-        if (this.stage != 0) {
-            String s = new String(ch, start, length);
-            if (this.stage == 3) {
-                this.error = s;
-            } else {
-                int val = Integer.parseInt(s);
-                switch (this.stage) {
-                case 1:
-                    this.favorite = val == 1;
-                    break;
-                case 2:
-                    this.email = val == 1;
-                    break;
-                }
             }
             this.stage = 0;
         }

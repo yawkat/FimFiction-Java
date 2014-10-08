@@ -1,23 +1,18 @@
 package at.yawk.fimfiction.core;
 
-import static at.yawk.fimfiction.data.Story.StoryKey.*;
-
 import at.yawk.fimfiction.data.*;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import at.yawk.fimfiction.data.Optional;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+
+import static at.yawk.fimfiction.data.Story.StoryKey.*;
 
 /**
  * Class for parsing pretty much any data in search HTML.
@@ -39,19 +34,21 @@ class SearchHtmlParser extends SearchParser {
 
     @Nullable Story story;
 
-    @Nullable StringBuilder title;
+    StringBuilder title = new StringBuilder();
     @Nullable User author;
     @Nullable StringBuilder authorName;
-    @Nullable FavoriteState favorited;
     @Nullable Set<Category> categories;
     @Nullable FormattedStringParser.FormattedStringHandler description;
     @Nullable Chapter chapter;
     @Nullable StringBuilder chapterTitle;
     @Nullable Set<FimCharacter> characters;
+    @Nullable Set<Shelf> shelves;
+    @Nullable Set<Shelf> shelvesNotAdded;
     @Nullable List<Chapter> chapters;
     int characterId;
     @Nullable Optional<User> loggedIn;
     @Nullable String nonce;
+    @Nullable Set<Shelf> globalShelves;
 
     @Override
     public void startElement(@Nonnull String uri,
@@ -60,25 +57,124 @@ class SearchHtmlParser extends SearchParser {
                              @Nonnull Attributes attributes) throws SAXException {
         switch (stage) {
         case 0:
-            if ("div".equals(qName) &&
-                "content_box post_content_box story_content_box".equals(attributes.getValue("class"))) {
-                story = Story.createMutable();
-                story.set(ID, Integer.parseInt(attributes.getValue("id").substring(6)));
-                if (idOnly) {
-                    finishedStories.add(story);
-                    story = null;
-                } else {
+            if (qName.equals("div")) {
+                String clazz = attributes.getValue("class");
+
+                if ("story_container".equals(clazz)) { // story container
                     stage = 1;
+                    story = Story.createMutable();
+                } else if ("menu_list bookshelves".equals(clazz)) { // bookshelf list
+                    globalShelves = new HashSet<Shelf>();
+                    stage = 500;
                 }
-            } else if (nonce == null && "a".equals(qName)) {
-                String nonce = attributes.getValue("data-nonce");
-                if (nonce != null) { this.nonce = nonce; }
+            }
+            break;
+        case 991:
+            if (qName.equals("a")) { // like button (no onclick when logged out)
+                String onclick = attributes.getValue("onclick");
+                if (onclick != null) {
+                    assert story != null;
+                    story.set(Story.StoryKey.RATING_TOKEN,
+                              onclick.substring(onclick.indexOf('\'') + 1, onclick.lastIndexOf('\'')));
+                }
+                stage = 992;
+            }
+            break;
+        case 992:
+        case 994:
+            if (qName.equals("span")) { // (dis-)like span
+                stage++;
+            }
+            break;
+        case 996:
+            if (qName.equals("div") && "story_content_box".equals(attributes.getValue("class"))) { // story id
+                assert story != null;
+                story.set(Story.StoryKey.ID, toIntLenient(attributes.getValue("id")));
+                stage = 883;
+            }
+            break;
+        case 997:
+            if (qName.equals("a")) { // content rating
+                String contentRating = attributes.getValue("class").substring(15);
+                assert story != null;
+                ContentRating rating = ContentRating.forId(contentRating);
+                assert rating != null;
+                story.set(Story.StoryKey.CONTENT_RATING, rating);
+                stage = 998;
+            }
+            break;
+        case 998:
+            if (qName.equals("a")) { // title tag
+                try {
+                    assert story != null;
+                    story.set(Story.StoryKey.URL, new URL(Constants.BASE_URL + attributes.getValue("href")));
+                } catch (MalformedURLException e) {
+                    throw new SAXException(e);
+                }
+                title.setLength(0);
+                stage = 999;
+            }
+            break;
+        case 880:
+            if (qName.equals("span")) {
+                assert story != null;
+                story.set(COMMENT_COUNT, toIntLenient(attributes.getValue("title")));
+                stage = 881;
+            }
+            break;
+        case 881:
+            if (qName.equals("span")) {
+                assert story != null;
+                story.set(VIEW_COUNT_TOTAL, toIntLenient(attributes.getValue("title")));
+                shelves = new HashSet<Shelf>();
+                shelvesNotAdded = new HashSet<Shelf>();
+                stage = 770;
+            }
+            break;
+        case 883:
+            if (qName.equals("span")) {
+                assert story != null;
+                StoryStatus status = StoryStatus.forId(attributes.getValue("class").substring(17));
+                assert status != null;
+                story.set(STATUS, status);
+                stage = 997;
+            }
+            break;
+        case 770:
+            if (qName.equals("li")) {
+                String idString = attributes.getValue("data-bookshelf");
+                if (idString != null) {
+                    int id = Integer.parseInt(idString);
+                    String title = attributes.getValue("title");
+                    boolean selected = "1".equals(attributes.getValue("data-added"));
+                    Shelf shelf = Shelf.createMutable();
+                    shelf.set(Shelf.ShelfKey.ID, id);
+                    shelf.set(Shelf.ShelfKey.NAME, title);
+                    if (selected) {
+                        assert shelves != null;
+                        shelves.add(shelf);
+                    } else {
+                        assert shelvesNotAdded != null;
+                        shelvesNotAdded.add(shelf);
+                    }
+                }
+            }
+            break;
+        case 500:
+            if ("li".equals(qName)) {
+                String idString = attributes.getValue("data-id");
+                if (idString != null) {
+                    int id = Integer.parseInt(idString);
+                    String name = attributes.getValue("data-name");
+                    assert globalShelves != null;
+                    globalShelves.add(Shelf.createMutable().set(Shelf.ShelfKey.ID, id).set(Shelf.ShelfKey.NAME, name));
+                }
             }
             break;
         case 1:
             String src = attributes.getValue("src");
             author = User.createMutable();
-            if (src != null && !"//www.fimfiction-static.net/images/avatars/none_64.png".equals(src)) {
+            if (!"//www.fimfiction-static.net/images/avatars/none_64.png".equals(src)) {
                 try {
                     author.set(User.UserKey.URL_PROFILE_IMAGE, Optional.existing(new URL("http:" + src)));
                 } catch (MalformedURLException e) {
@@ -91,67 +187,8 @@ class SearchHtmlParser extends SearchParser {
             break;
         case 2:
             if ("div".equals(qName) && "right".equals(attributes.getValue("class"))) {
-                stage = 3;
+                stage = 991;
             }
-            break;
-        case 3:
-            stage = "track_container".equals(attributes.getValue("class")) ? 4 : 6;
-            break;
-        case 4:
-            if ("a".equals(qName)) {
-                favorited = attributes.getValue("class").contains("favourite_button_selected") ?
-                        FavoriteState.FAVORITED :
-                        FavoriteState.NOT_FAVORITED;
-                stage = 5;
-            }
-            break;
-        case 5:
-            if ("input".equals(qName)) {
-                if (favorited != null) {
-                    boolean email = attributes.getValue("checked") != null;
-                    assert story != null;
-                    story.set(FAVORITE_STATE,
-                              email && favorited.isFavorited() ? FavoriteState.FAVORITED_WITH_EMAIL : favorited);
-                }
-                stage = 6;
-            }
-            break;
-        case 6:
-            if ("a".equals(qName)) {
-                String onClick = attributes.getValue("onclick");
-                if (onClick != null && onClick.startsWith("Ra")) {
-                    assert story != null;
-                    story.set(RATING_TOKEN, onClick.substring(onClick.indexOf('\'') + 1, onClick.lastIndexOf('\'')));
-                }
-                stage = 7;
-            }
-            break;
-        case 8:
-            if ("a".equals(qName)) {
-                stage = 9;
-            }
-            break;
-        case 10:
-            if ("b".equals(qName)) {
-                stage = 300;
-            }
-            break;
-        case 301:
-            if ("span".equals(qName)) {
-                String title = attributes.getValue("title");
-                if (title != null) {
-                    assert story != null;
-                    story.set(VIEW_COUNT_TOTAL, toIntLiberal(title));
-                    stage = 11;
-                }
-            }
-            break;
-        case 12:
-            if ("a".equals(qName)) {
-                assert story != null;
-                story.set(READ_LATER_STATE, attributes.getValue("class").contains("read_it_later_selected"));
-            }
-            stage = 14;
             break;
         case 14:
             if ("a".equals(qName)) {
@@ -228,7 +265,7 @@ class SearchHtmlParser extends SearchParser {
             break;
         case 28:
             if ("ul".equals(qName)) {
-                chapters = Lists.newArrayList();
+                chapters = new ArrayList<Chapter>();
                 stage = 29;
             }
             break;
@@ -293,7 +330,7 @@ class SearchHtmlParser extends SearchParser {
         case 37:
             if ("a".equals(qName)) {
                 assert chapter != null;
-                chapter.set(Chapter.ChapterKey.ID, toIntLiberal(attributes.getValue("href")));
+                chapter.set(Chapter.ChapterKey.ID, toIntLenient(attributes.getValue("href")));
                 assert chapters != null;
                 chapters.add(chapter);
                 chapter = null;
@@ -351,7 +388,7 @@ class SearchHtmlParser extends SearchParser {
                 story = null;
                 stage = 0;
             } else if ("a".equals(qName)) {
-                characterId = toIntLiberal(attributes.getValue("href"));
+                characterId = toIntLenient(attributes.getValue("href"));
             }
             break;
         }
@@ -363,6 +400,29 @@ class SearchHtmlParser extends SearchParser {
             return;
         }
         switch (stage) {
+        case 999:
+            assert story != null;
+            story.set(Story.StoryKey.TITLE, title.toString());
+            stage = 16;
+            break;
+        case 770:
+            if (qName.equals("ul")) {
+                assert story != null;
+                assert shelves != null;
+                assert shelvesNotAdded != null;
+                story.set(SHELVES_ADDED, shelves);
+                story.set(SHELVES_NOT_ADDED, shelvesNotAdded);
+
+                LegacySupport.deriveFavoriteAndReadLaterFromShelves(story);
+
+                stage = 996;
+            }
+            break;
+        case 500:
+            if ("ul".equals(qName)) {
+                stage = 0;
+            }
+            break;
         case 11:
             if ("div".equals(qName)) {
                 stage = 12;
@@ -458,23 +518,17 @@ class SearchHtmlParser extends SearchParser {
             return;
         }
         switch (stage) {
-        case 7:
+        case 993:
             assert story != null;
-            story.set(LIKE_COUNT, toIntLiberal(asString));
-            stage = 8;
+            story.set(Story.StoryKey.LIKE_COUNT, toIntLenient(asString));
+            stage = 994;
             break;
-        case 9:
+        case 995:
             assert story != null;
-            story.set(DISLIKE_COUNT, toIntLiberal(asString));
-            stage = 10;
+            story.set(Story.StoryKey.DISLIKE_COUNT, toIntLenient(asString));
+            stage = 880;
             break;
-        case 300:
-            assert story != null;
-            story.set(COMMENT_COUNT, toIntLiberal(asString));
-            stage = 301;
-            break;
-        case 15:
-            assert title != null;
+        case 999:
             title.append(asString);
             break;
         case 17:
@@ -483,8 +537,8 @@ class SearchHtmlParser extends SearchParser {
             break;
         case 19:
             assert story != null;
-            story.set(VIEW_COUNT_MAXIMUM_CHAPTER, toIntLiberal(asString.substring(0, asString.indexOf('('))));
-            story.set(VIEW_COUNT_TOTAL, toIntLiberal(asString.substring(asString.indexOf('('))));
+            story.set(VIEW_COUNT_MAXIMUM_CHAPTER, toIntLenient(asString.substring(0, asString.indexOf('('))));
+            story.set(VIEW_COUNT_TOTAL, toIntLenient(asString.substring(asString.indexOf('('))));
             stage = 20;
             break;
         case 25:
@@ -513,7 +567,7 @@ class SearchHtmlParser extends SearchParser {
             stage = 35;
             break;
         case 36:
-            int c = toIntLiberal(asString, -1);
+            int c = toIntLenient(asString, -1);
             if (c >= -1) {
                 assert chapter != null;
                 chapter.set(Chapter.ChapterKey.WORD_COUNT, c);
@@ -543,7 +597,7 @@ class SearchHtmlParser extends SearchParser {
             }
             break;
         case 204:
-            int words = toIntLiberal(asString, -1);
+            int words = toIntLenient(asString, -1);
             if (words >= 0) {
                 assert story != null;
                 story.set(WORD_COUNT, words);
@@ -553,7 +607,7 @@ class SearchHtmlParser extends SearchParser {
         case 40:
             assert story != null;
             story.set(DATE_FIRST_POSTED, parseDate(asString));
-            characters = Sets.newHashSet();
+            characters = new HashSet<FimCharacter>();
             stage = 41;
             break;
         case 43:
@@ -573,11 +627,11 @@ class SearchHtmlParser extends SearchParser {
         }
     }
 
-    private static int toIntLiberal(String toInt) {
-        return toIntLiberal(toInt, 0);
+    private static int toIntLenient(String toInt) {
+        return toIntLenient(toInt, 0);
     }
 
-    private static int toIntLiberal(@Nullable String toInt, int defaultValue) {
+    private static int toIntLenient(@Nullable String toInt, int defaultValue) {
         if (toInt != null) {
             int result = 0;
             boolean modified = false;
