@@ -21,7 +21,7 @@ abstract class EnumKeyBundle<T extends EnumKeyBundle, K extends Enum<K> & Key> e
      */
     private static final Map<Class<?>, BundleTypeData<?, ?>> dataByBundleClass = Maps.newHashMap();
 
-    private final BundleTypeData<T, K> bundleTypeData;
+    BundleTypeData<T, K> bundleTypeData;
 
     /**
      * Whether this object should be immutable.
@@ -33,7 +33,9 @@ abstract class EnumKeyBundle<T extends EnumKeyBundle, K extends Enum<K> & Key> e
     Object[] data;
 
     @SuppressWarnings("unchecked")
-    EnumKeyBundle() { this.bundleTypeData = EnumKeyBundle.getBundleTypeData((Class<T>) getClass()); }
+    EnumKeyBundle() {
+        this.bundleTypeData = EnumKeyBundle.getBundleTypeData((Class<T>) getClass());
+    }
 
     // factories
 
@@ -262,6 +264,7 @@ class BundleTypeData<T extends EnumKeyBundle, K extends Enum<K> & Key> {
         keySet = ImmutableSet.copyOf(keys.values());
         // create singleton
         emptyImmutableSingleton = create();
+        emptyImmutableSingleton.bundleTypeData = this;
         emptyImmutableSingleton.data = new Object[getKeyCount()];
         emptyImmutableSingleton.immutable = true;
     }
