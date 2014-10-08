@@ -27,7 +27,7 @@ public class SessionActions {
         Preconditions.checkNotNull(password);
 
         HttpResponse response = NetUtil.post(httpClient,
-                                             "https://www.fimfiction.net/ajax/login.php",
+                                             Constants.BASE_URL + "/ajax/login.php",
                                              "keep_logged_in",
                                              "1",
                                              "username",
@@ -60,7 +60,7 @@ public class SessionActions {
     public static void logout(@Nonnull HttpClient httpClient, String nonce) throws IOException {
         Preconditions.checkNotNull(httpClient);
 
-        HttpResponse response = NetUtil.post(httpClient, "https://www.fimfiction.net/ajax/logout.php", "nonce", nonce);
+        HttpResponse response = NetUtil.post(httpClient, Constants.BASE_URL + "/ajax/logout.php", "nonce", nonce);
         NetUtil.close(response);
     }
 

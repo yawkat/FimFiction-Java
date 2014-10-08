@@ -74,8 +74,8 @@ public class Meta {
     public Story request(@Nonnull HttpClient httpClient) throws IOException, SAXException {
         HttpResponse response = NetUtil.get(httpClient,
                                             withContent ?
-                                                    "https://www.fimfiction.net/api/v1/story/" + storyId + "?chapters" :
-                                                    "https://www.fimfiction.net/api/story.php?story=" + storyId);
+                                                    Constants.BASE_URL + "/api/v1/story/" + storyId + "?chapters" :
+                                                    Constants.BASE_URL + "/api/story.php?story=" + storyId);
         try {
             JsonParser2<Story, Story.StoryKey> parser =
                     JsonParser2.story(new JsonReader(new InputStreamReader(response.getEntity().getContent(),

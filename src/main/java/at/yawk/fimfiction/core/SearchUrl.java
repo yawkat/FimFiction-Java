@@ -100,7 +100,7 @@ public class SearchUrl {
     public URL build() {
         CompiledSearchParameters parameters = this.parameters; // race conditions
         if (parameters == null) {
-            return createUrlNonNull("https://www.fimfiction.net/story/" + id);
+            return createUrlNonNull(Constants.BASE_URL + "/story/" + id);
         } else {
             return createUrlNonNull(parameters.url + (page + 1));
         }
@@ -128,7 +128,7 @@ public class SearchUrl {
         public static CompiledSearchParameters compile(@Nonnull SearchParameters p) throws MissingKeyException {
             Preconditions.checkNotNull(p);
 
-            StringBuilder result = new StringBuilder("https://www.fimfiction.net/index.php?view=category");
+            StringBuilder result = new StringBuilder(Constants.BASE_URL + "/index.php?view=category");
 
             if (p.has(NAME)) { result.append("&term=").append(encodeUtf8(p.getString(NAME))); }
             if (p.has(ORDER)) { result.append("&order=").append(encodeOrder(p.<Order>get(ORDER))); }
