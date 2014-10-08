@@ -134,8 +134,17 @@ class SearchHtmlParser extends SearchParser {
         case 883:
             if (qName.equals("span")) {
                 assert story != null;
-                StoryStatus status = StoryStatus.forId(attributes.getValue("class").substring(17));
-                assert status != null;
+                String statusName = attributes.getValue("class").substring(17);
+                StoryStatus status;
+                if (statusName.equals("complete")) {
+                    status = StoryStatus.COMPLETED;
+                } else if (statusName.equals("incomplete")) {
+                    status = StoryStatus.INCOMPLETE;
+                } else if (statusName.equals("on_hiatus")) {
+                    status = StoryStatus.ON_HIATUS;
+                } else {
+                    status = StoryStatus.CANCELLED;
+                }
                 story.set(STATUS, status);
                 stage = 997;
             }
