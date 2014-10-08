@@ -128,6 +128,7 @@ public class Deserializer {
         if (type == User.class) { return (B) User.createMutable(); }
         if (type == SearchParameters.class) { return (B) SearchParameters.createMutable(); }
         if (type == SearchResult.class) { return (B) SearchResult.createMutable(); }
+        if (type == Shelf.class) { return (B) Shelf.createMutable(); }
         throw new UnsupportedOperationException("Unsupported bundle type: " + type.getSimpleName());
     }
 
