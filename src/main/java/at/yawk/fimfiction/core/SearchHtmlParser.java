@@ -29,7 +29,7 @@ class SearchHtmlParser extends SearchParser {
 
     final SimpleDateFormat fimfictionDateFormat = new SimpleDateFormat("d MMM yyyy", Locale.ENGLISH);
 
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     boolean idOnly;
 
@@ -498,11 +498,6 @@ class SearchHtmlParser extends SearchParser {
             }
             break;
         case 200:
-            if ("a".equals(qName)) {
-                stage = 201;
-            }
-            break;
-        case 201:
             if ("a".equals(qName)) {
                 stage = 202;
             }
