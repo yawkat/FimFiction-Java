@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -27,6 +28,8 @@ class SearchHtmlParser extends SearchParser {
      */
 
     final SimpleDateFormat fimfictionDateFormat = new SimpleDateFormat("d MMM yyyy", Locale.ENGLISH);
+
+    private static final boolean DEBUG = false;
 
     boolean idOnly;
 
@@ -55,6 +58,13 @@ class SearchHtmlParser extends SearchParser {
                              @Nonnull String localName,
                              @Nonnull String qName,
                              @Nonnull Attributes attributes) throws SAXException {
+        if (DEBUG) {
+            StringBuilder n = new StringBuilder(qName);
+            for(int i = 0; i < attributes.getLength(); i++) {
+                n.append(' ').append(attributes.getQName(i)).append('(').append(attributes.getValue(i)).append(')');
+            }
+            debug("start", stage, n.toString());
+        }
         switch (stage) {
         case 0:
             if (qName.equals("div")) {
@@ -90,7 +100,7 @@ class SearchHtmlParser extends SearchParser {
             if (qName.equals("div") && "story_content_box".equals(attributes.getValue("class"))) { // story id
                 assert story != null;
                 story.set(Story.StoryKey.ID, toIntLenient(attributes.getValue("id")));
-                stage = 883;
+                stage = 997;
             }
             break;
         case 997:
@@ -126,27 +136,29 @@ class SearchHtmlParser extends SearchParser {
             if (qName.equals("span")) {
                 assert story != null;
                 story.set(VIEW_COUNT_TOTAL, toIntLenient(attributes.getValue("title")));
-                shelves = new HashSet<Shelf>();
-                shelvesNotAdded = new HashSet<Shelf>();
-                stage = 770;
+                // TODO VIEW_COUNT_MAXIMUM_CHAPTER
+                stage = 996;
             }
             break;
         case 883:
             if (qName.equals("span")) {
                 assert story != null;
-                String statusName = attributes.getValue("class").substring(17);
-                StoryStatus status;
-                if (statusName.equals("complete")) {
-                    status = StoryStatus.COMPLETED;
-                } else if (statusName.equals("incomplete")) {
-                    status = StoryStatus.INCOMPLETE;
-                } else if (statusName.equals("on_hiatus")) {
-                    status = StoryStatus.ON_HIATUS;
-                } else {
-                    status = StoryStatus.CANCELLED;
+                String clazz = attributes.getValue("class");
+                if (clazz != null) {
+                    String statusName = clazz.substring(17);
+                    StoryStatus status;
+                    if (statusName.equals("complete")) {
+                        status = StoryStatus.COMPLETED;
+                    } else if (statusName.equals("incomplete")) {
+                        status = StoryStatus.INCOMPLETE;
+                    } else if (statusName.equals("on_hiatus")) {
+                        status = StoryStatus.ON_HIATUS;
+                    } else {
+                        status = StoryStatus.CANCELLED;
+                    }
+                    story.set(STATUS, status);
+                    stage = 38;
                 }
-                story.set(STATUS, status);
-                stage = 997;
             }
             break;
         case 770:
@@ -192,7 +204,9 @@ class SearchHtmlParser extends SearchParser {
             } else {
                 author.set(User.UserKey.URL_PROFILE_IMAGE, Optional.missing(URL.class));
             }
-            stage = 2;
+            shelves = new HashSet<Shelf>();
+            shelvesNotAdded = new HashSet<Shelf>();
+            stage = 770;
             break;
         case 2:
             if ("div".equals(qName) && "right".equals(attributes.getValue("class"))) {
@@ -215,12 +229,6 @@ class SearchHtmlParser extends SearchParser {
             if ("a".equals(qName)) {
                 authorName = new StringBuilder();
                 stage = 17;
-            }
-            break;
-        case 18:
-            if ("img".equals(qName) &&
-                "//www.fimfiction-static.net/images/icons/views.png".equals(attributes.getValue("src"))) {
-                stage = 19;
             }
             break;
         case 20:
@@ -293,7 +301,7 @@ class SearchHtmlParser extends SearchParser {
                 story.set(CHAPTERS, chapters);
                 story.set(CHAPTER_COUNT, chapters.size());
                 chapters = null;
-                stage = 38;
+                stage = 883;
             }
             break;
         case 100:
@@ -405,6 +413,9 @@ class SearchHtmlParser extends SearchParser {
 
     @Override
     public void endElement(@Nonnull String uri, @Nonnull String localName, @Nonnull String qName) throws SAXException {
+        if (DEBUG) {
+            debug("end", stage, qName);
+        }
         if (stage == 0) {
             return;
         }
@@ -424,7 +435,7 @@ class SearchHtmlParser extends SearchParser {
 
                 LegacySupport.deriveFavoriteAndReadLaterFromShelves(story);
 
-                stage = 996;
+                stage = 2;
             }
             break;
         case 500:
@@ -450,7 +461,7 @@ class SearchHtmlParser extends SearchParser {
             assert story != null;
             story.set(AUTHOR, author);
             authorName = null;
-            stage = 18;
+            stage = 20;
             break;
         case 26:
             stage = 27;
@@ -506,6 +517,9 @@ class SearchHtmlParser extends SearchParser {
 
     @Override
     public void characters(@Nonnull char[] ch, int start, int length) throws SAXException {
+        if (DEBUG) {
+            debug("char", stage, new String(ch, start, length));
+        }
         if (stage == 0) {
             if (loggedIn == null) {
                 String asString = new String(ch, start, length).trim();
@@ -543,12 +557,6 @@ class SearchHtmlParser extends SearchParser {
         case 17:
             assert authorName != null;
             authorName.append(asString);
-            break;
-        case 19:
-            assert story != null;
-            story.set(VIEW_COUNT_MAXIMUM_CHAPTER, toIntLenient(asString.substring(0, asString.indexOf('('))));
-            story.set(VIEW_COUNT_TOTAL, toIntLenient(asString.substring(asString.indexOf('('))));
-            stage = 20;
             break;
         case 25:
             if (categories == null) {
@@ -609,7 +617,7 @@ class SearchHtmlParser extends SearchParser {
             int words = toIntLenient(asString, -1);
             if (words >= 0) {
                 assert story != null;
-                story.set(WORD_COUNT, words);
+                story.set(WORD_COUNT, words); // TODO I think this moved
                 stage = 205;
             }
             break;
@@ -711,4 +719,9 @@ class SearchHtmlParser extends SearchParser {
     }
 
     static boolean isWhitespace(char c) { return c == ' ' || c == '\n' || c == '\r' || c == '\t'; }
+
+    private static void debug(String type, int stage, String data) {
+        assert DEBUG;
+        System.out.printf("%5s %4d %s%n", type, stage, StringEscapeUtils.escapeJava(data));
+    }
 }
