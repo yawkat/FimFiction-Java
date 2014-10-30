@@ -176,7 +176,10 @@ public class Story extends EnumKeyBundle<Story, Story.StoryKey> {
         RATING("rating", ValueType.RATING),
         /**
          * Rating token String used for rating this story.
+         *
+         * @deprecated Unused.
          */
+        @Deprecated
         RATING_TOKEN("rating_token", ValueType.STRING),
         /**
          * Shelves this story is part of.

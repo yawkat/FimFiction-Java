@@ -65,9 +65,7 @@ public class AccountActions {
                                              "story",
                                              story.get(Story.StoryKey.ID).toString(),
                                              "rating",
-                                             like ? "100" : "0",
-                                             "ip",
-                                             story.get(Story.StoryKey.RATING_TOKEN).toString());
+                                             like ? "100" : "0");
 
         try {
             XMLReader xmlReader = new Parser();

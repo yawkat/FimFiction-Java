@@ -81,12 +81,6 @@ class SearchHtmlParser extends SearchParser {
             break;
         case 991:
             if (qName.equals("a")) { // like button (no onclick when logged out)
-                String onclick = attributes.getValue("onclick");
-                if (onclick != null) {
-                    assert story != null;
-                    story.set(Story.StoryKey.RATING_TOKEN,
-                              onclick.substring(onclick.indexOf('\'') + 1, onclick.lastIndexOf('\'')));
-                }
                 stage = 992;
             }
             break;
